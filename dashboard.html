@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SurfaceQ Security Dashboard — Real-time security overview, threat analysis, and AI-powered remediation guidance.">
+  <title>Dashboard – SurfaceQ</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- SurfaceQ Main Stylesheet -->
+  <link rel="stylesheet" href="assets/css/main.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'sq-bg': '#050816',
+            'sq-surface': '#0a0e1a',
+            'sq-border': 'rgba(255,255,255,0.06)',
+            'sq-cyan': '#00e5ff',
+            'sq-purple': '#7c4dff',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* ── Scrollbar Styling ── */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* ── Glass Card ── */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* ── Risk Breakdown Bar ── */
+    .risk-bar-track {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .risk-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* ── Chat Bubbles ── */
+    .chat-bubble-ai {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 0 1rem 1rem 1rem;
+      max-width: 85%;
+    }
+    .chat-bubble-user {
+      background: rgba(0, 229, 255, 0.08);
+      border: 1px solid rgba(0, 229, 255, 0.15);
+      border-radius: 1rem 0 1rem 1rem;
+      max-width: 85%;
+    }
+
+    /* ── Section Title ── */
+    .section-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    /* ── Pulse Glow ── */
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.15); }
+      50% { box-shadow: 0 0 20px 4px rgba(0, 229, 255, 0.08); }
+    }
+    .pulse-glow {
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+
+    /* ── Fade-in animation ── */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .fade-in-up {
+      animation: fadeInUp 0.5s ease-out both;
+    }
+    .fade-in-up-1 { animation-delay: 0.05s; }
+    .fade-in-up-2 { animation-delay: 0.1s; }
+    .fade-in-up-3 { animation-delay: 0.15s; }
+    .fade-in-up-4 { animation-delay: 0.2s; }
+    .fade-in-up-5 { animation-delay: 0.25s; }
+
+    /* ── Chat input focus ── */
+    .chat-input:focus {
+      outline: none;
+      border-color: rgba(0, 229, 255, 0.4);
+      box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.08);
+    }
+
+    /* ── View All link hover ── */
+    .view-all-link {
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+    .view-all-link:hover {
+      color: #00e5ff;
+      transform: translateX(2px);
+    }
+  </style>
+</head>
+
+<body class="bg-sq-bg text-white font-sans flex min-h-screen">
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       SIDEBAR COMPONENT
+       ════════════════════════════════════════════════════════════════════ -->
+  <sq-sidebar></sq-sidebar>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       MAIN CONTENT AREA
+       ════════════════════════════════════════════════════════════════════ -->
+  <main class="flex-1 ml-[260px] min-h-screen overflow-y-auto p-0">
+
+    <!-- Header Component -->
+    <sq-header title="Dashboard" subtitle="Security Overview"></sq-header>
+
+    <!-- Content Wrapper -->
+    <div class="p-6 space-y-6">
+
+      <!-- ══════════════════════════════════════════════════════════════
+           ROW 1 — Stat Cards
+           ══════════════════════════════════════════════════════════════ -->
+      <section id="stats-row" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <sq-stat-card label="Total Scans" value="247" icon="scan" trend="up" class="fade-in-up fade-in-up-1"></sq-stat-card>
+        <sq-stat-card label="Findings" value="1,832" icon="alert" trend="up" class="fade-in-up fade-in-up-2"></sq-stat-card>
+        <sq-stat-card label="Endpoints" value="456" icon="link" trend="neutral" class="fade-in-up fade-in-up-3"></sq-stat-card>
+        <sq-stat-card label="Avg Risk Score" value="62" icon="gauge" trend="down" class="fade-in-up fade-in-up-4"></sq-stat-card>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           ROW 2 — Risk Score + Threat Timeline
+           ══════════════════════════════════════════════════════════════ -->
+      <section id="risk-timeline-row" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Left Column: Risk Score + Breakdown -->
+        <div class="space-y-4 fade-in-up fade-in-up-2">
+          <!-- Risk Score Card -->
+          <div class="glass-card flex flex-col items-center justify-center pulse-glow">
+            <sq-risk-score score="67"></sq-risk-score>
+          </div>
+
+          <!-- Risk Breakdown Panel -->
+          <div class="glass-card space-y-4">
+            <h3 class="section-title">Risk Breakdown</h3>
+
+            <!-- Headers -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-400">Headers</span>
+                <span class="text-sm font-semibold text-white">72<span class="text-gray-500">/100</span></span>
+              </div>
+              <div class="risk-bar-track">
+                <div class="risk-bar-fill" style="width: 72%; background: linear-gradient(90deg, #00e5ff, #00b8d4);"></div>
+              </div>
+            </div>
+
+            <!-- SSL/TLS -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-400">SSL/TLS</span>
+                <span class="text-sm font-semibold text-white">85<span class="text-gray-500">/100</span></span>
+              </div>
+              <div class="risk-bar-track">
+                <div class="risk-bar-fill" style="width: 85%; background: linear-gradient(90deg, #00e5ff, #18ffff);"></div>
+              </div>
+            </div>
+
+            <!-- Content Security -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-400">Content Security</span>
+                <span class="text-sm font-semibold text-white">45<span class="text-gray-500">/100</span></span>
+              </div>
+              <div class="risk-bar-track">
+                <div class="risk-bar-fill" style="width: 45%; background: linear-gradient(90deg, #ff6d00, #ff9100);"></div>
+              </div>
+            </div>
+
+            <!-- Information Disclosure -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-400">Information Disclosure</span>
+                <span class="text-sm font-semibold text-white">60<span class="text-gray-500">/100</span></span>
+              </div>
+              <div class="risk-bar-track">
+                <div class="risk-bar-fill" style="width: 60%; background: linear-gradient(90deg, #7c4dff, #b388ff);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Threat Timeline -->
+        <div class="glass-card fade-in-up fade-in-up-3">
+          <h3 class="section-title mb-4">Threat Timeline</h3>
+          <div class="relative" style="height: 320px;">
+            <canvas id="threatTimelineChart"></canvas>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           ROW 3 — Security Categories Radar + Asset Distribution Doughnut
+           ══════════════════════════════════════════════════════════════ -->
+      <section id="charts-row" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Left: Security Categories Radar Chart -->
+        <div class="glass-card fade-in-up fade-in-up-2">
+          <h3 class="section-title mb-4">Security Categories</h3>
+          <div class="relative" style="height: 320px;">
+            <canvas id="securityCategoriesChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Right: Asset Distribution Doughnut Chart -->
+        <div class="glass-card fade-in-up fade-in-up-3">
+          <h3 class="section-title mb-4">Asset Distribution</h3>
+          <div class="relative" style="height: 320px;">
+            <canvas id="assetDistributionChart"></canvas>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           ROW 4 — Recent Findings
+           ══════════════════════════════════════════════════════════════ -->
+      <section id="recent-findings" class="fade-in-up fade-in-up-3">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold tracking-tight">Recent Findings</h2>
+          <a href="findings.html" class="view-all-link inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-sq-cyan transition-colors">
+            View All
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="space-y-3">
+          <sq-finding
+            severity="high"
+            title="Missing Content Security Policy"
+            description="No CSP header detected. This allows potential XSS attacks and data injection."
+            owasp="A05:2021"
+            url="https://chriz-3656.github.io"
+          ></sq-finding>
+
+          <sq-finding
+            severity="high"
+            title="HSTS Not Enabled"
+            description="Strict-Transport-Security header is missing. Users may be vulnerable to protocol downgrade attacks."
+            owasp="A02:2021"
+            url="https://chriz-3656.github.io"
+          ></sq-finding>
+
+          <sq-finding
+            severity="medium"
+            title="Mixed Content Detected"
+            description="Page loads resources over HTTP while served over HTTPS, potentially exposing data."
+            owasp="A02:2021"
+            url="https://chriz-3656.github.io/assets/legacy.js"
+          ></sq-finding>
+
+          <sq-finding
+            severity="medium"
+            title="Outdated jQuery Version"
+            description="jQuery 2.1.4 detected. This version has known XSS vulnerabilities (CVE-2020-11022)."
+            owasp="A06:2021"
+            url="https://chriz-3656.github.io/js/jquery.min.js"
+          ></sq-finding>
+
+          <sq-finding
+            severity="low"
+            title="Missing Referrer Policy"
+            description="No Referrer-Policy header set. Browser will send full URL in referer header to external sites."
+            owasp="A05:2021"
+            url="https://chriz-3656.github.io"
+          ></sq-finding>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           ROW 5 — AI Security Assistant
+           ══════════════════════════════════════════════════════════════ -->
+      <section id="ai-assistant" class="fade-in-up fade-in-up-4">
+        <div class="glass-card">
+
+          <!-- Title -->
+          <div class="flex items-center gap-2.5 mb-5">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sq-cyan/20 to-sq-purple/20 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-sq-cyan" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/>
+              </svg>
+            </div>
+            <h3 class="section-title">AI Security Assistant</h3>
+            <span class="ml-auto inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+              Online
+            </span>
+          </div>
+
+          <!-- Chat Container -->
+          <div id="chat-container" class="max-h-[300px] overflow-y-auto space-y-4 mb-4 pr-1">
+
+            <!-- AI Message 1 -->
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-full bg-gradient-to-br from-sq-cyan to-sq-purple flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                </svg>
+              </div>
+              <div class="chat-bubble-ai px-4 py-3">
+                <p class="text-sm text-gray-300 leading-relaxed">Hello! I'm your AI security assistant. I can help analyze findings, suggest remediations, and explain security concepts. What would you like to know?</p>
+              </div>
+            </div>
+
+            <!-- User Message -->
+            <div class="flex items-start gap-3 flex-row-reverse">
+              <div class="w-7 h-7 rounded-full bg-gradient-to-br from-sq-cyan/30 to-sq-cyan/10 border border-sq-cyan/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3.5 h-3.5 text-sq-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                </svg>
+              </div>
+              <div class="chat-bubble-user px-4 py-3">
+                <p class="text-sm text-gray-200 leading-relaxed">What are the most critical issues found?</p>
+              </div>
+            </div>
+
+            <!-- AI Message 2 -->
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-full bg-gradient-to-br from-sq-cyan to-sq-purple flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                </svg>
+              </div>
+              <div class="chat-bubble-ai px-4 py-3">
+                <div class="text-sm text-gray-300 leading-relaxed space-y-2">
+                  <p>Based on the current scan, the top priorities are:</p>
+                  <p><strong class="text-white">1. Missing CSP Header</strong> — This is critical as it leaves the site vulnerable to XSS attacks. Add a <code class="px-1.5 py-0.5 rounded bg-white/5 text-sq-cyan text-xs font-mono">Content-Security-Policy</code> header.</p>
+                  <p><strong class="text-white">2. No HSTS</strong> — Enable <code class="px-1.5 py-0.5 rounded bg-white/5 text-sq-cyan text-xs font-mono">Strict-Transport-Security</code> to prevent downgrade attacks.</p>
+                  <p><strong class="text-white">3. Outdated jQuery</strong> — Update to jQuery 3.7+ to patch known CVEs.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Chat Input -->
+          <div class="flex items-center gap-3">
+            <input
+              id="chat-input"
+              type="text"
+              placeholder="Ask about security findings..."
+              class="chat-input flex-1 bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 transition-all duration-200"
+            >
+            <button
+              id="chat-send-btn"
+              type="button"
+              class="w-11 h-11 rounded-xl bg-gradient-to-br from-sq-cyan to-sq-purple flex items-center justify-center hover:opacity-90 transition-opacity active:scale-95 transform flex-shrink-0"
+              aria-label="Send message"
+            >
+              <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
+              </svg>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+    </div><!-- /Content Wrapper -->
+  </main>
+
+  <!-- Toast Container Component -->
+  <sq-toast-container></sq-toast-container>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       WEB COMPONENT IMPORTS
+       ════════════════════════════════════════════════════════════════════ -->
+  <script type="module">
+    import './components/sidebar.js';
+    import './components/header.js';
+    import './components/risk-score.js';
+    import './components/finding-card.js';
+    import './components/scan-button.js';
+    import './components/stat-card.js';
+    import './components/toast-container.js';
+  </script>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       CHART.JS INITIALIZATION
+       ════════════════════════════════════════════════════════════════════ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // ── Shared Chart Defaults ──
+      Chart.defaults.color = 'rgba(255, 255, 255, 0.45)';
+      Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+      Chart.defaults.font.size = 12;
+
+      const cyanColor = '#00e5ff';
+      const purpleColor = '#7c4dff';
+      const cyanAlpha = (a) => `rgba(0, 229, 255, ${a})`;
+      const purpleAlpha = (a) => `rgba(124, 77, 255, ${a})`;
+
+      // ── 1. Threat Timeline — Line Chart ──
+      const timelineCtx = document.getElementById('threatTimelineChart');
+      if (timelineCtx) {
+        new Chart(timelineCtx.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [
+              {
+                label: 'Findings',
+                data: [42, 58, 35, 71, 49, 62, 55],
+                borderColor: cyanColor,
+                backgroundColor: cyanAlpha(0.05),
+                borderWidth: 2,
+                pointBackgroundColor: cyanColor,
+                pointBorderColor: cyanColor,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBorderWidth: 0,
+                tension: 0.4,
+                fill: true,
+              },
+              {
+                label: 'Resolved',
+                data: [28, 45, 30, 52, 40, 55, 48],
+                borderColor: purpleColor,
+                backgroundColor: purpleAlpha(0.05),
+                borderWidth: 2,
+                pointBackgroundColor: purpleColor,
+                pointBorderColor: purpleColor,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBorderWidth: 0,
+                tension: 0.4,
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              mode: 'index',
+              intersect: false,
+            },
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                align: 'end',
+                labels: {
+                  usePointStyle: true,
+                  pointStyle: 'circle',
+                  boxWidth: 6,
+                  boxHeight: 6,
+                  padding: 16,
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  font: { size: 11, weight: '500' },
+                },
+              },
+              tooltip: {
+                backgroundColor: 'rgba(10, 14, 26, 0.95)',
+                borderColor: 'rgba(255, 255, 255, 0.08)',
+                borderWidth: 1,
+                cornerRadius: 10,
+                padding: 12,
+                titleColor: '#fff',
+                bodyColor: 'rgba(255, 255, 255, 0.7)',
+                titleFont: { weight: '600' },
+                bodyFont: { size: 12 },
+                displayColors: true,
+                boxWidth: 8,
+                boxHeight: 8,
+                boxPadding: 4,
+                usePointStyle: true,
+              },
+            },
+            scales: {
+              x: {
+                grid: {
+                  color: 'rgba(255, 255, 255, 0.03)',
+                  drawBorder: false,
+                },
+                ticks: {
+                  color: 'rgba(255, 255, 255, 0.4)',
+                  font: { size: 11 },
+                },
+              },
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(255, 255, 255, 0.03)',
+                  drawBorder: false,
+                },
+                ticks: {
+                  color: 'rgba(255, 255, 255, 0.4)',
+                  font: { size: 11 },
+                  stepSize: 20,
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // ── 2. Security Categories — Radar Chart ──
+      const radarCtx = document.getElementById('securityCategoriesChart');
+      if (radarCtx) {
+        new Chart(radarCtx.getContext('2d'), {
+          type: 'radar',
+          data: {
+            labels: ['Headers', 'SSL', 'Content', 'Scripts', 'Privacy', 'Configuration'],
+            datasets: [
+              {
+                label: 'Current Score',
+                data: [72, 85, 45, 68, 52, 78],
+                backgroundColor: cyanAlpha(0.1),
+                borderColor: cyanColor,
+                borderWidth: 2,
+                pointBackgroundColor: cyanColor,
+                pointBorderColor: '#050816',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+              },
+              {
+                label: 'Baseline',
+                data: [60, 70, 55, 50, 65, 60],
+                backgroundColor: purpleAlpha(0.06),
+                borderColor: purpleAlpha(0.5),
+                borderWidth: 1.5,
+                borderDash: [4, 4],
+                pointBackgroundColor: purpleColor,
+                pointBorderColor: '#050816',
+                pointBorderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                align: 'end',
+                labels: {
+                  usePointStyle: true,
+                  pointStyle: 'circle',
+                  boxWidth: 6,
+                  boxHeight: 6,
+                  padding: 16,
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  font: { size: 11, weight: '500' },
+                },
+              },
+              tooltip: {
+                backgroundColor: 'rgba(10, 14, 26, 0.95)',
+                borderColor: 'rgba(255, 255, 255, 0.08)',
+                borderWidth: 1,
+                cornerRadius: 10,
+                padding: 12,
+                titleColor: '#fff',
+                bodyColor: 'rgba(255, 255, 255, 0.7)',
+                titleFont: { weight: '600' },
+              },
+            },
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  stepSize: 20,
+                  color: 'rgba(255, 255, 255, 0.25)',
+                  backdropColor: 'transparent',
+                  font: { size: 10 },
+                },
+                grid: {
+                  color: 'rgba(255, 255, 255, 0.05)',
+                },
+                angleLines: {
+                  color: 'rgba(255, 255, 255, 0.05)',
+                },
+                pointLabels: {
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  font: { size: 11, weight: '500' },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // ── 3. Asset Distribution — Doughnut Chart ──
+      const doughnutCtx = document.getElementById('assetDistributionChart');
+      if (doughnutCtx) {
+        new Chart(doughnutCtx.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Scripts', 'Stylesheets', 'Images', 'APIs', 'Forms', 'Other'],
+            datasets: [
+              {
+                data: [35, 22, 45, 18, 8, 12],
+                backgroundColor: [
+                  cyanAlpha(0.8),
+                  purpleAlpha(0.8),
+                  'rgba(0, 184, 212, 0.7)',
+                  'rgba(179, 136, 255, 0.7)',
+                  'rgba(0, 229, 255, 0.4)',
+                  'rgba(124, 77, 255, 0.4)',
+                ],
+                borderColor: [
+                  cyanColor,
+                  purpleColor,
+                  '#00b8d4',
+                  '#b388ff',
+                  cyanAlpha(0.6),
+                  purpleAlpha(0.6),
+                ],
+                borderWidth: 1,
+                hoverOffset: 8,
+                borderRadius: 4,
+                spacing: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+            plugins: {
+              legend: {
+                display: true,
+                position: 'right',
+                labels: {
+                  usePointStyle: true,
+                  pointStyle: 'rectRounded',
+                  boxWidth: 10,
+                  boxHeight: 10,
+                  padding: 14,
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  font: { size: 11, weight: '500' },
+                  generateLabels: function(chart) {
+                    const data = chart.data;
+                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    return data.labels.map((label, i) => ({
+                      text: `${label} (${data.datasets[0].data[i]})`,
+                      fillStyle: data.datasets[0].backgroundColor[i],
+                      strokeStyle: data.datasets[0].borderColor[i],
+                      lineWidth: 1,
+                      hidden: false,
+                      index: i,
+                      pointStyle: 'rectRounded',
+                    }));
+                  },
+                },
+              },
+              tooltip: {
+                backgroundColor: 'rgba(10, 14, 26, 0.95)',
+                borderColor: 'rgba(255, 255, 255, 0.08)',
+                borderWidth: 1,
+                cornerRadius: 10,
+                padding: 12,
+                titleColor: '#fff',
+                bodyColor: 'rgba(255, 255, 255, 0.7)',
+                titleFont: { weight: '600' },
+                callbacks: {
+                  label: function(context) {
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const pct = ((context.parsed / total) * 100).toFixed(1);
+                    return ` ${context.label}: ${context.parsed} (${pct}%)`;
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // ── Chat Send Functionality ──
+      const chatInput = document.getElementById('chat-input');
+      const chatSendBtn = document.getElementById('chat-send-btn');
+      const chatContainer = document.getElementById('chat-container');
+
+      function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        // Add user bubble
+        const userBubble = document.createElement('div');
+        userBubble.className = 'flex items-start gap-3 flex-row-reverse';
+        userBubble.innerHTML = `
+          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-sq-cyan/30 to-sq-cyan/10 border border-sq-cyan/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg class="w-3.5 h-3.5 text-sq-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+            </svg>
+          </div>
+          <div class="chat-bubble-user px-4 py-3">
+            <p class="text-sm text-gray-200 leading-relaxed">${message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+          </div>
+        `;
+        chatContainer.appendChild(userBubble);
+
+        chatInput.value = '';
+
+        // Add AI typing indicator then response
+        setTimeout(() => {
+          const aiBubble = document.createElement('div');
+          aiBubble.className = 'flex items-start gap-3';
+          aiBubble.innerHTML = `
+            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-sq-cyan to-sq-purple flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+              </svg>
+            </div>
+            <div class="chat-bubble-ai px-4 py-3">
+              <p class="text-sm text-gray-300 leading-relaxed">I'll analyze that for you. Based on the current scan data, I'd recommend focusing on the high-severity findings first, particularly the missing security headers. Would you like specific remediation steps?</p>
+            </div>
+          `;
+          chatContainer.appendChild(aiBubble);
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 800);
+
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+
+      if (chatSendBtn) {
+        chatSendBtn.addEventListener('click', sendMessage);
+      }
+      if (chatInput) {
+        chatInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
+      }
+
+    });
+  </script>
+
+</body>
+</html>

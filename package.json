@@ -1,0 +1,37 @@
+{
+  "name": "surfaceq",
+  "version": "1.0.0",
+  "description": "AI-Powered Real-Time Attack Surface Intelligence",
+  "private": true,
+  "workspaces": ["server"],
+  "scripts": {
+    "dev": "cd server && npm run dev",
+    "build": "cd server && npm run build",
+    "start": "cd server && npm start",
+    "lint": "cd server && npm run lint",
+    "test": "cd server && npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chriz-3656/Surface-Q.git"
+  },
+  "keywords": [
+    "security",
+    "attack-surface",
+    "browser-extension",
+    "ai",
+    "vulnerability-scanner",
+    "cybersecurity",
+    "chrome-extension",
+    "threat-intelligence"
+  ],
+  "author": "chriz-3656",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chriz-3656/Surface-Q/issues"
+  },
+  "homepage": "https://github.com/chriz-3656/Surface-Q#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
