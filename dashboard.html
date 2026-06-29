@@ -851,6 +851,11 @@
         }
         score = Math.max(10, Math.min(100, score));
 
+        // Fallback to Server-Side AI Assessment score if available
+        if (scan.aiAssessment && typeof scan.aiAssessment.score === 'number') {
+          score = scan.aiAssessment.score;
+        }
+
         // Set risk score element
         const scoreGauge = document.querySelector('sq-risk-score');
         if (scoreGauge) {
@@ -940,14 +945,27 @@
         // Update AI message fallback greeting
         const aiResponse = document.querySelector('#chat-container .chat-bubble-ai:last-of-type p');
         if (aiResponse) {
-          let advice = `I've analyzed the scan for <strong class="text-white">${scan.domain}</strong>.<br><br>`;
-          if (missingHeaders.length > 0) {
-            advice += `🚨 The primary issue is the missing security headers (${missingHeaders.map(h => h.header).join(', ')}). `;
-            advice += `Implementing a robust Content Security Policy (CSP) and Strict-Transport-Security (HSTS) headers should be prioritized to harden this target against injection and man-in-the-middle attacks.`;
+          if (scan.aiAssessment) {
+            let advice = `🧠 <strong>SurfaceQ AI Assisted Threat Report</strong> for <strong class="text-white">${scan.domain}</strong>:<br><br>`;
+            advice += `<strong>Overview:</strong> ${scan.aiAssessment.executiveSummary}<br><br>`;
+            advice += `<strong>Risk Profile:</strong> ${scan.aiAssessment.riskExplanation}<br><br>`;
+            if (scan.aiAssessment.recommendations && scan.aiAssessment.recommendations.length > 0) {
+              advice += `<strong>Remediation Tasks:</strong><br>`;
+              scan.aiAssessment.recommendations.forEach(rec => {
+                advice += `• ${rec}<br>`;
+              });
+            }
+            aiResponse.innerHTML = advice;
           } else {
-            advice += `✨ Excellent setup! All standard security headers are correctly in place. Tech stack fingerprinting detected: ${scan.technologies.join(', ') || 'No custom framework signatures detected'}.`;
+            let advice = `I've analyzed the scan for <strong class="text-white">${scan.domain}</strong>.<br><br>`;
+            if (missingHeaders.length > 0) {
+              advice += `🚨 The primary issue is the missing security headers (${missingHeaders.map(h => h.header).join(', ')}). `;
+              advice += `Implementing a robust Content Security Policy (CSP) and Strict-Transport-Security (HSTS) headers should be prioritized to harden this target against injection and man-in-the-middle attacks.`;
+            } else {
+              advice += `✨ Excellent setup! All standard security headers are correctly in place. Tech stack fingerprinting detected: ${scan.technologies.join(', ') || 'No custom framework signatures detected'}.`;
+            }
+            aiResponse.innerHTML = advice;
           }
-          aiResponse.innerHTML = advice;
         }
       }
 
