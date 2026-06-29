@@ -195,10 +195,10 @@
               This website is safe to browse. All standard protections are active.
             </p>
             <div class="flex items-center gap-4 pt-2">
-              <a href="#ai" class="px-5 py-2.5 rounded-xl bg-gradient-to-br from-sq-cyan to-sq-purple text-xs font-bold text-white tracking-wide hover:opacity-95 transition-opacity duration-200">
+              <a href="#ai" class="px-5 py-2.5 rounded-xl bg-gradient-to-br from-sq-cyan to-sq-purple text-xs font-bold text-white tracking-wide hover:opacity-95 transition-opacity duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sq-cyan">
                 Explain Details
               </a>
-              <button onclick="window.location.reload()" class="px-5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] text-xs font-bold text-gray-300 transition-all duration-200">
+              <button onclick="window.location.reload()" class="px-5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] text-xs font-bold text-gray-300 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20" aria-label="Refresh Dashboard">
                 Refresh Check
               </button>
             </div>
@@ -387,9 +387,9 @@
       <section id="recent-findings" class="fade-in-up fade-in-up-3">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-semibold tracking-tight">Recent Findings</h2>
-          <a href="findings.html" class="view-all-link inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-sq-cyan transition-colors">
+          <a href="findings.html" class="view-all-link inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-sq-cyan transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sq-cyan rounded-md px-2 py-1">
             View All
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
             </svg>
           </a>
@@ -483,14 +483,15 @@
               type="text"
               placeholder="Ask about security findings..."
               class="chat-input flex-1 bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 transition-all duration-200"
+              aria-label="Chat input field"
             >
             <button
               id="chat-send-btn"
               type="button"
-              class="w-11 h-11 rounded-xl bg-gradient-to-br from-sq-cyan to-sq-purple flex items-center justify-center hover:opacity-90 transition-opacity active:scale-95 transform flex-shrink-0"
+              class="w-11 h-11 rounded-xl bg-gradient-to-br from-sq-cyan to-sq-purple flex items-center justify-center hover:opacity-90 transition-opacity active:scale-95 transform flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-sq-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
               aria-label="Send message"
             >
-              <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
               </svg>
             </button>
