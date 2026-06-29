@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 320px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background-color: #050816;
+      color: #ffffff;
+    }
+    h1 {
+      font-size: 1.25rem;
+      margin: 0 0 12px 0;
+      background: linear-gradient(135deg, #00e5ff, #7c4dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #00e5ff, #7c4dff);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: opacity 0.2s;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .status {
+      font-size: 0.875rem;
+      color: #a0aec0;
+      margin-bottom: 8px;
+    }
+    .result {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 0.8rem;
+      max-height: 180px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Shield 🛡️ SurfaceQ</h1>
+  <div class="status" id="status">Ready to scan current website.</div>
+  <button id="scan-btn">Scan Website</button>
+  <div class="result" id="result-box"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
