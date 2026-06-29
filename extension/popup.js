@@ -24,3 +24,15 @@ document.getElementById("scan-btn").addEventListener("click", () => {
     }
   });
 });
+
+// Launch local web dashboard
+document.getElementById("view-dashboard-link").addEventListener("click", (e) => {
+  e.preventDefault();
+  chrome.tabs.create({ url: "http://localhost:3000/dashboard.html" });
+});
+
+// Launch official repository website
+document.getElementById("view-repo-link").addEventListener("click", (e) => {
+  e.preventDefault();
+  chrome.tabs.create({ url: "https://github.com/chriz-3656/Surface-Q" });
+});
