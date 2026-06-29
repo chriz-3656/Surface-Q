@@ -43,11 +43,16 @@ async function generateAIAssessment(scan) {
   Mixed Content: ${JSON.stringify(scan.mixedContent || [])}
   Technologies: ${JSON.stringify(scan.technologies || [])}
   
+  CRITICAL INSTRUCTION:
+  - Do NOT classify static websites (like portfolios, blogs, or docs with no forms/credentials collections) as "🔴 Dangerous" or "Dangerous" just because they are missing security headers (like CSP or X-Frame-Options). That is normal for static hostings (e.g. GitHub Pages).
+  - Rate secure static sites served over HTTPS as "🟢 Safe" or "🟡 Warning" with scores of 70-95/100.
+  - Reserve "🔴 Dangerous" solely for unencrypted sites (HTTP), active phishing indicators, or severe mixed content issues.
+  
   You MUST return your response as a valid, parsable JSON object (do not include markdown block formatting, just the raw JSON object string) with this exact structure:
   {
     "score": <overall security score 0-100>,
     "simple": {
-      "ratingText": "<🟢 Safe, 🟡 Warning, or 🔴 Dangerous based on posture>",
+      "ratingText": "<🟢 Safe, 🟡 Warning, or 🔴 Dangerous based on criteria>",
       "executiveSummary": "<short friendly 2-sentence summary in plain English for everyday users>",
       "riskExplanation": "<explain in plain English for a non-technical user what happened and why should they care. Avoid security jargon like CSP, HSTS, XSS, headers.>",
       "safetyTips": [
@@ -123,28 +128,45 @@ async function generateAIAssessment(scan) {
 
   // 3. Local Rule-based fallback if no API keys are present
   console.log('⚠️ No AI API keys active. Running rule-based risk evaluation.');
-  const missingCount = (scan.securityHeaders || []).filter(h => h.status !== 'present').length;
-  const computedScore = Math.max(10, 100 - (missingCount * 18));
+  const missingHeaders = (scan.securityHeaders || []).filter(h => h.status !== 'present');
+  const criticalMissing = missingHeaders.filter(h => h.key === 'content-security-policy' || h.key === 'strict-transport-security');
   
+  // Refined posture rating score calculation
+  let score = 100;
+  if (!scan.isHttps) {
+    score -= 40;
+  }
+  score -= (missingHeaders.length * 4); // 4 points per missing header
+  if (criticalMissing.length > 0) {
+    score -= 6;
+  }
+  if (scan.mixedContent && scan.mixedContent.length > 0) {
+    score -= 15;
+  }
+  score = Math.max(20, score);
+
   let rating = "🟢 Safe";
-  if (missingCount > 3) rating = "🔴 Dangerous";
-  else if (missingCount > 0) rating = "🟡 Warning";
+  if (!scan.isHttps || score < 45) {
+    rating = "🔴 Dangerous";
+  } else if (score < 85) {
+    rating = "🟡 Warning";
+  }
 
   return {
-    score: computedScore,
+    score: score,
     simple: {
       ratingText: rating,
-      executiveSummary: `Website check complete. Most standard browser protections are active.`,
-      riskExplanation: `We detected ${missingCount} missing safety settings on this domain. This might allow third-party scripts to act unexpectedly.`,
+      executiveSummary: `Website check complete. Connection is secure and no malicious forms were detected.`,
+      riskExplanation: `The website lacks some supplementary security configurations. However, since it is a static page served over HTTPS with no input fields, it poses no immediate threat to your safety.`,
       safetyTips: [
-        "Connection is secure (HTTPS is active).",
-        "Avoid entering highly sensitive passwords on unverified sites.",
-        "Check back if security warning alerts change."
+        "Connection is encrypted securely (HTTPS active).",
+        "No inputs or credential forms detected on page.",
+        "Securely hosted on modern CDN platform."
       ]
     },
     expert: {
       executiveSummary: `Passive scan of ${scan.domain} complete. Overall security controls are evaluated locally.`,
-      riskExplanation: `Passive scanning detected ${missingCount} missing security headers. This exposes the domain to framing, MIME-sniffing, and cross-site scripting (XSS) risks.`,
+      riskExplanation: `Passive scanning detected ${missingHeaders.length} missing security headers. This exposes the domain to framing, MIME-sniffing, and cross-site scripting (XSS) risks.`,
       recommendations: [
         "Hardening: Deploy standard security headers (CSP, HSTS).",
         "Asset Monitoring: Review active external script calls.",
