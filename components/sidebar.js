@@ -241,8 +241,8 @@ class SQSidebar extends HTMLElement {
         .sidebar {
           width: 260px;
           height: 100%;
-          background: #0a0e1a;
-          border-right: 1px solid rgba(255, 255, 255, 0.06);
+          background: #0f0f11;
+          border-right: 1px solid #27272a;
           display: flex;
           flex-direction: column;
           transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);

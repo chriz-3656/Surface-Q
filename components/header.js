@@ -127,10 +127,8 @@ class SQHeader extends HTMLElement {
           justify-content: space-between;
           height: 70px;
           padding: 0 24px;
-          background: rgba(15, 20, 40, 0.8);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          background: #0f0f11;
+          border-bottom: 1px solid #27272a;
           box-sizing: border-box;
         }
 

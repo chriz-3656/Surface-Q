@@ -33,8 +33,13 @@ chrome.runtime.onInstalled.addListener(() => {
 // Listener for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "scan_tab") {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const activeTab = tabs[0];
+    chrome.tabs.query({}, (tabs) => {
+      // Search all tabs across all windows for the active web page
+      let activeTab = tabs.find(t => t.active && t.url && !t.url.startsWith("chrome-extension://") && !t.url.startsWith("chrome://"));
+      if (!activeTab) {
+        activeTab = tabs.find(t => t.url && !t.url.startsWith("chrome-extension://") && !t.url.startsWith("chrome://"));
+      }
+      if (!activeTab) activeTab = tabs[0];
       if (!activeTab) {
         sendResponse({ status: "error", message: "No active tab found" });
         return;
@@ -48,37 +53,55 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return;
       }
 
-      // Check if we have cached headers for this site
-      const cached = headerCache[hostname] || { headers: {} };
+      const runScan = (headers) => {
+        // Send message to content script to collect DOM-based metrics
+        chrome.tabs.sendMessage(activeTab.id, { action: "collect_metadata" }, (response) => {
+          const payload = response || {
+            title: activeTab.title,
+            url: activeTab.url,
+            domain: hostname,
+            technologies: [],
+            forms: [],
+            scripts: [],
+            externalResources: { stylesheets: [], images: [], iframes: [] },
+            mixedContent: []
+          };
+          
+          payload.securityHeaders = evaluateHeaders(headers);
+          payload.rawHeaders = headers;
 
-      // Send message to content script to collect DOM-based metrics
-      chrome.tabs.sendMessage(activeTab.id, { action: "collect_metadata" }, (response) => {
-        if (chrome.runtime.lastError || !response) {
-          // Fallback if content script cannot execute
-          sendResponse({
-            status: "success",
-            data: {
-              url: activeTab.url,
-              domain: hostname,
-              title: activeTab.title,
-              technologies: [],
-              forms: [],
-              scripts: [],
-              externalResources: { stylesheets: [], images: [], iframes: [] },
-              mixedContent: [],
-              securityHeaders: evaluateHeaders(cached.headers),
-              rawHeaders: cached.headers
-            }
+          // Sync scan details to the local dashboard server cache
+          fetch("http://localhost:3000/api/scans", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          }).catch((err) => console.warn("Dashboard sync failed", err));
+
+          sendResponse({ status: "success", data: payload });
+        });
+      };
+
+      if (headerCache[hostname]) {
+        runScan(headerCache[hostname].headers);
+      } else {
+        // Passive fallback: request headers dynamically
+        fetch(activeTab.url, { method: "HEAD" })
+          .then((res) => {
+            const headers = {};
+            res.headers.forEach((value, name) => {
+              headers[name.toLowerCase()] = value;
+            });
+            headerCache[hostname] = {
+              timestamp: Date.now(),
+              headers: headers
+            };
+            runScan(headers);
+          })
+          .catch((err) => {
+            console.warn("Passive header fetch failed, using empty cache", err);
+            runScan({});
           });
-          return;
-        }
-
-        // Attach header results to the final payload
-        response.securityHeaders = evaluateHeaders(cached.headers);
-        response.rawHeaders = cached.headers;
-
-        sendResponse({ status: "success", data: response });
-      });
+      }
     });
     return true; // Keep message channel open for async response
   }

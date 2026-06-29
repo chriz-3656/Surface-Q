@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:,">
   <meta name="description" content="SurfaceQ Security Dashboard — Real-time security overview, threat analysis, and AI-powered remediation guidance.">
   <title>Dashboard – SurfaceQ</title>
 
@@ -17,8 +18,8 @@
   <!-- SurfaceQ Main Stylesheet -->
   <link rel="stylesheet" href="assets/css/main.css">
 
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Local Chart.js Script -->
+  <script src="assets/js/chart.js"></script>
 
   <!-- Tailwind Configuration -->
   <script>
@@ -156,7 +157,7 @@
   <!-- ════════════════════════════════════════════════════════════════════
        MAIN CONTENT AREA
        ════════════════════════════════════════════════════════════════════ -->
-  <main class="flex-1 ml-[260px] min-h-screen overflow-y-auto p-0">
+  <main class="flex-1 min-h-screen overflow-y-auto p-0">
 
     <!-- Header Component -->
     <sq-header title="Dashboard" subtitle="Security Overview"></sq-header>
@@ -558,7 +559,7 @@
       // ── 2. Security Categories — Radar Chart ──
       const radarCtx = document.getElementById('securityCategoriesChart');
       if (radarCtx) {
-        new Chart(radarCtx.getContext('2d'), {
+        window.securityCategoriesChartInstance = new Chart(radarCtx.getContext('2d'), {
           type: 'radar',
           data: {
             labels: ['Headers', 'SSL', 'Content', 'Scripts', 'Privacy', 'Configuration'],
@@ -648,7 +649,7 @@
       // ── 3. Asset Distribution — Doughnut Chart ──
       const doughnutCtx = document.getElementById('assetDistributionChart');
       if (doughnutCtx) {
-        new Chart(doughnutCtx.getContext('2d'), {
+        window.assetDistributionChartInstance = new Chart(doughnutCtx.getContext('2d'), {
           type: 'doughnut',
           data: {
             labels: ['Scripts', 'Stylesheets', 'Images', 'APIs', 'Forms', 'Other'],
@@ -777,6 +778,148 @@
 
         chatContainer.scrollTop = chatContainer.scrollHeight;
       }
+
+      // ── 4. Real-time API Integration for Scans ──
+      function updateDashboardData(scan) {
+        if (!scan) return;
+
+        // Update Title & Subtitle
+        const headerEl = document.querySelector('sq-header');
+        if (headerEl) {
+          headerEl.setAttribute('title', scan.domain || 'Dashboard');
+          headerEl.setAttribute('subtitle', 'Target URL: ' + scan.url);
+          headerEl.scanStatus = 'complete';
+        }
+
+        // Calculate custom risk score
+        const securityHeaders = scan.securityHeaders || [];
+        const missingHeaders = securityHeaders.filter(h => h.status !== 'present');
+        let headerScore = 100 - (missingHeaders.length * 20);
+        headerScore = Math.max(0, Math.min(100, headerScore));
+
+        let score = headerScore;
+        if (scan.mixedContent && scan.mixedContent.length > 0) {
+          score -= 15;
+        }
+        score = Math.max(10, Math.min(100, score));
+
+        // Set risk score element
+        const scoreGauge = document.querySelector('sq-risk-score');
+        if (scoreGauge) {
+          scoreGauge.setAttribute('score', score.toString());
+        }
+
+        // Update Stat Cards values
+        const statCards = document.querySelectorAll('sq-stat-card');
+        if (statCards.length >= 4) {
+          statCards[1].setAttribute('value', (missingHeaders.length + (scan.mixedContent ? scan.mixedContent.length : 0)).toString());
+          statCards[2].setAttribute('value', (scan.scripts ? scan.scripts.length : 0).toString());
+          statCards[3].setAttribute('value', score.toString());
+        }
+
+        // Update Breakdown Progress Bars
+        const riskBarTracks = document.querySelectorAll('.risk-bar-track');
+        riskBarTracks.forEach((track, idx) => {
+          const valueText = track.previousElementSibling.querySelector('span');
+          if (idx === 0) {
+            track.querySelector('.risk-bar-fill').style.width = headerScore + '%';
+            valueText.innerHTML = headerScore + '<span class="text-gray-500">/100</span>';
+          } else if (idx === 1) {
+            const sslVal = scan.isHttps ? 95 : 0;
+            track.querySelector('.risk-bar-fill').style.width = sslVal + '%';
+            valueText.innerHTML = sslVal + '<span class="text-gray-500">/100</span>';
+          } else if (idx === 2) {
+            const cspVal = securityHeaders.some(h => h.key === 'content-security-policy' && h.status === 'present') ? 100 : 0;
+            track.querySelector('.risk-bar-fill').style.width = cspVal + '%';
+            valueText.innerHTML = cspVal + '<span class="text-gray-500">/100</span>';
+          }
+        });
+
+        // Clear and render findings
+        const findingsContainer = document.querySelector('#recent-findings > .space-y-3');
+        if (findingsContainer) {
+          findingsContainer.innerHTML = '';
+          
+          missingHeaders.forEach(h => {
+            const card = document.createElement('sq-finding');
+            card.setAttribute('severity', h.key === 'content-security-policy' || h.key === 'strict-transport-security' ? 'high' : 'medium');
+            card.setAttribute('title', 'Missing ' + h.header);
+            card.setAttribute('description', h.recommendation || 'Header is missing.');
+            card.setAttribute('owasp', h.key === 'content-security-policy' ? 'A05:2021' : 'A02:2021');
+            card.setAttribute('url', scan.url);
+            findingsContainer.appendChild(card);
+          });
+
+          if (scan.mixedContent && scan.mixedContent.length > 0) {
+            scan.mixedContent.forEach(item => {
+              const card = document.createElement('sq-finding');
+              card.setAttribute('severity', 'medium');
+              card.setAttribute('title', 'Mixed Content: ' + item.type);
+              card.setAttribute('description', 'Resource loaded insecurely over HTTP: ' + item.url);
+              card.setAttribute('owasp', 'A02:2021');
+              card.setAttribute('url', scan.url);
+              findingsContainer.appendChild(card);
+            });
+          }
+
+          if (missingHeaders.length === 0 && (!scan.mixedContent || scan.mixedContent.length === 0)) {
+            findingsContainer.innerHTML = '<div class="text-sm text-gray-500 p-4 text-center">No security vulnerability findings detected. Excellent security posture!</div>';
+          }
+        }
+
+        // Update charts datasets
+        const scriptsCount = scan.scripts ? scan.scripts.length : 0;
+        const stylesCount = (scan.externalResources && scan.externalResources.stylesheets) ? scan.externalResources.stylesheets.length : 0;
+        const imgCount = (scan.externalResources && scan.externalResources.images) ? scan.externalResources.images.length : 0;
+        const iframesCount = (scan.externalResources && scan.externalResources.iframes) ? scan.externalResources.iframes.length : 0;
+        const formsCount = scan.forms ? scan.forms.length : 0;
+
+        if (window.assetDistributionChartInstance) {
+          window.assetDistributionChartInstance.data.datasets[0].data = [
+            scriptsCount, stylesCount, imgCount, 0, formsCount, iframesCount
+          ];
+          window.assetDistributionChartInstance.update();
+        }
+
+        if (window.securityCategoriesChartInstance) {
+          const cspScore = securityHeaders.some(h => h.key === 'content-security-policy' && h.status === 'present') ? 100 : 0;
+          window.securityCategoriesChartInstance.data.datasets[0].data = [
+            headerScore, scan.isHttps ? 95 : 0, cspScore, 70, 80, 85
+          ];
+          window.securityCategoriesChartInstance.update();
+        }
+
+        // Update AI message fallback greeting
+        const aiResponse = document.querySelector('#chat-container .chat-bubble-ai:last-of-type p');
+        if (aiResponse) {
+          let advice = `I've analyzed the scan for <strong class="text-white">${scan.domain}</strong>.<br><br>`;
+          if (missingHeaders.length > 0) {
+            advice += `🚨 The primary issue is the missing security headers (${missingHeaders.map(h => h.header).join(', ')}). `;
+            advice += `Implementing a robust Content Security Policy (CSP) and Strict-Transport-Security (HSTS) headers should be prioritized to harden this target against injection and man-in-the-middle attacks.`;
+          } else {
+            advice += `✨ Excellent setup! All standard security headers are correctly in place. Tech stack fingerprinting detected: ${scan.technologies.join(', ') || 'No custom framework signatures detected'}.`;
+          }
+          aiResponse.innerHTML = advice;
+        }
+      }
+
+      function checkLatestScan() {
+        fetch('http://localhost:3000/api/scans/latest')
+          .then(res => {
+            if (res.ok) return res.json();
+            throw new Error('No scan data cached yet');
+          })
+          .then(data => {
+            updateDashboardData(data);
+          })
+          .catch(err => {
+            console.log('Sync status: ' + err.message);
+          });
+      }
+
+      // Check on load and poll every 3 seconds
+      checkLatestScan();
+      setInterval(checkLatestScan, 3000);
 
       if (chatSendBtn) {
         chatSendBtn.addEventListener('click', sendMessage);
