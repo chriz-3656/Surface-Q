@@ -82,6 +82,66 @@ app.post('/api/analyze', (req, res) => {
   });
 });
 
+// Groq AI API Chat Endpoint
+app.post('/api/chat', async (req, res) => {
+  const { message, scanContext } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: 'Message is required' });
+  }
+
+  const groqApiKey = process.env.GROQ_API_KEY;
+  if (!groqApiKey) {
+    // Return friendly local model evaluation advice if API key is not configured yet
+    return res.json({
+      reply: `🛡️ <strong>[SurfaceQ AI - Offline Mode]</strong> Groq API key is not configured.<br><br>
+      To enable live LLM threat advisory insights, please add <code>GROQ_API_KEY=your_key</code> inside your server <code>.env</code> file.<br><br>
+      <strong>Context Analysis:</strong><br>
+      • Scanned Target: <code>${scanContext?.domain || 'None active'}</code><br>
+      • Vulnerability Count: <code>${scanContext ? (scanContext.securityHeaders.filter(h => h.status !== 'present').length + scanContext.mixedContent.length) : 0}</code>`
+    });
+  }
+
+  try {
+    const systemPrompt = `You are SurfaceQ AI, a premium cybersecurity attack surface analyst. 
+    Analyze the following scanned site context and respond to the user query:
+    Domain: ${scanContext?.domain || 'unknown'}
+    URL: ${scanContext?.url || 'unknown'}
+    Security Headers: ${JSON.stringify(scanContext?.securityHeaders || [])}
+    Mixed Content: ${JSON.stringify(scanContext?.mixedContent || [])}
+    Technologies: ${JSON.stringify(scanContext?.technologies || [])}
+    
+    Format responses in clean html syntax with strong markers and bullet points. Focus purely on technical vulnerability mitigation and architectural hardening. Keep responses short and executive.`;
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${groqApiKey}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message }
+        ],
+        temperature: 0.5
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Groq API returned ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    const reply = data.choices[0].message.content;
+    res.json({ reply });
+  } catch (err) {
+    console.error('Groq API Error:', err);
+    res.status(500).json({ error: 'Failed to generate response from Groq AI: ' + err.message });
+  }
+});
+
 // Start listening
 app.listen(PORT, () => {
   console.log(`==================================================`);
