@@ -175,6 +175,9 @@
               <span id="simple-status-badge" class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-950/60 text-emerald-400 border border-emerald-800/30">
                 🟢 Safe
               </span>
+              <span id="simple-architecture-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-850 text-zinc-300 border border-zinc-700/60 cursor-help" title="Evaluating site architecture type...">
+                Static Site
+              </span>
               <h2 id="simple-target-domain" class="text-2xl font-bold text-white tracking-tight">domain.com</h2>
             </div>
             <p id="simple-exec-summary" class="text-base text-gray-300 leading-relaxed font-normal">
@@ -927,6 +930,14 @@
         const simpleDomain = document.getElementById('simple-target-domain');
         if (simpleDomain) {
           simpleDomain.textContent = scan.domain || 'Dashboard';
+        }
+
+        const simpleArch = document.getElementById('simple-architecture-badge');
+        if (simpleArch) {
+          const mode = scan.aiAssessment ? (scan.aiAssessment.renderingMode || "Static") : "Static";
+          const expl = scan.aiAssessment ? (scan.aiAssessment.renderingExplanation || "Static CDN hosting detected.") : "Static CDN hosting detected.";
+          simpleArch.textContent = mode + " Site";
+          simpleArch.setAttribute('title', expl);
         }
 
         const simpleExec = document.getElementById('simple-exec-summary');

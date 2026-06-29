@@ -40,6 +40,7 @@ async function generateAIAssessment(scan) {
   Domain: ${scan.domain}
   URL: ${scan.url}
   Security Headers: ${JSON.stringify(scan.securityHeaders || [])}
+  Raw Response Headers: ${JSON.stringify(scan.rawHeaders || {})}
   Mixed Content: ${JSON.stringify(scan.mixedContent || [])}
   Technologies: ${JSON.stringify(scan.technologies || [])}
   
@@ -47,10 +48,13 @@ async function generateAIAssessment(scan) {
   - Do NOT classify static websites (like portfolios, blogs, or docs with no forms/credentials collections) as "🔴 Dangerous" or "Dangerous" just because they are missing security headers (like CSP or X-Frame-Options). That is normal for static hostings (e.g. GitHub Pages).
   - Rate secure static sites served over HTTPS as "🟢 Safe" or "🟡 Warning" with scores of 70-95/100.
   - Reserve "🔴 Dangerous" solely for unencrypted sites (HTTP), active phishing indicators, or severe mixed content issues.
+  - Identify whether this site is statically generated (Static) or dynamic server-side rendering (Server-side) based on the technologies, cookies (Set-Cookie), or server header profiles (e.g. GitHub.com/Varnish/Cloudflare caching vs dynamic back-ends like PHP, Apache, Node, or Django).
   
   You MUST return your response as a valid, parsable JSON object (do not include markdown block formatting, just the raw JSON object string) with this exact structure:
   {
     "score": <overall security score 0-100>,
+    "renderingMode": "<Static or Server-side>",
+    "renderingExplanation": "<brief 1-sentence explanation of why (e.g., Static CDN hosting with zero active server cookies vs. dynamic session management / SSR headers)>",
     "simple": {
       "ratingText": "<🟢 Safe, 🟡 Warning, or 🔴 Dangerous based on criteria>",
       "executiveSummary": "<short friendly 2-sentence summary in plain English for everyday users>",
@@ -152,8 +156,24 @@ async function generateAIAssessment(scan) {
     rating = "🟡 Warning";
   }
 
+  // Static vs. Server-Side detection heuristics
+  const raw = scan.rawHeaders || {};
+  let renderingMode = "Static";
+  let renderingExplanation = "Site appears to be statically hosted on a CDN (e.g. GitHub Pages, Netlify) with no dynamic server cookies detected.";
+  
+  const serverHeader = (raw['server'] || '').toLowerCase();
+  const hasCookies = !!raw['set-cookie'];
+  const hasSSRTech = (scan.technologies || []).some(t => ['next.js', 'nuxt.js', 'django', 'laravel', 'wordpress', 'php'].includes(t.toLowerCase()));
+  
+  if (hasCookies || hasSSRTech || serverHeader.includes('php') || serverHeader.includes('apache') || serverHeader.includes('nginx') || serverHeader.includes('iis') || serverHeader.includes('gunicorn')) {
+    renderingMode = "Server-side";
+    renderingExplanation = `Site uses a dynamic back-end web server (${serverHeader || 'dynamic engine'}) or manages dynamic cookies/sessions.`;
+  }
+
   return {
     score: score,
+    renderingMode: renderingMode,
+    renderingExplanation: renderingExplanation,
     simple: {
       ratingText: rating,
       executiveSummary: `Website check complete. Connection is secure and no malicious forms were detected.`,
