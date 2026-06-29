@@ -11,7 +11,7 @@
 **Understand the security posture of any website in real-time.**
 *Passive analysis • AI-powered insights • Zero data collection*
 
-[Features](#features) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Contributing](#contributing)
+[Features](#features) • [Quick Start](#quick-start) • [Testing](#-automated-testing) • [Documentation](#documentation) • [Contributing](#contributing)
 
 </div>
 
@@ -45,6 +45,9 @@ Whether you're a security researcher auditing client infrastructure, a developer
 
 ### 🔍 Passive Scanning
 Automatically analyze every website you visit without sending additional network requests. SurfaceQ inspects HTTP response headers, extracts security-relevant configurations, and identifies missing protections — all from data your browser already receives during normal page loads.
+
+### 🔄 Real-time Extension-to-Dashboard Sync
+Scan results collected by the browser extension are immediately transmitted to the local backend and dynamically updated on your open dashboard via live API polling, updating all charts, metrics, and risk scores on the fly.
 
 ### 🤖 AI Analysis
 Powered by Google Gemini AI, SurfaceQ transforms raw security headers and technical metadata into comprehensive threat assessments. The AI engine understands the relationships between different security configurations and identifies compound vulnerabilities that simple rule-based checks would miss.
@@ -87,39 +90,55 @@ A full-featured web dashboard provides deep-dive analysis capabilities, historic
    - You should see the SurfaceQ shield icon in your Chrome toolbar
    - Click the icon to open the popup and verify it loads correctly
 
-### Server Setup
+### Server Setup (Choose Node.js, Docker, or PowerShell Fallback)
 
-1. **Install dependencies**
+#### Option A: Node.js (Recommended)
+1. Install dependencies inside `server` directory:
    ```bash
    cd server
    npm install
    ```
-
-2. **Configure environment**
-   ```bash
-   cp .env.example .env
-   ```
-   Edit `.env` and add your configuration:
-   ```env
-   PORT=3000
-   GEMINI_API_KEY=your_gemini_api_key_here
-   DB_PATH=./data/surfaceq.db
-   ```
-
-3. **Start the server**
+2. Start the server:
    ```bash
    npm start
    ```
-   The server will start on `http://localhost:3000` by default.
+3. Open `http://localhost:3000/dashboard.html` in your browser.
 
-4. **Access the dashboard**
-   Open `http://localhost:3000/dashboard` in your browser to view the interactive analysis dashboard.
+#### Option B: Docker Compose
+If you prefer running inside Docker:
+```bash
+docker compose up --build -d
+```
+The server will bind to `http://localhost:3000` (or `3001` based on your setup).
 
-### Getting a Gemini API Key
+#### Option C: Native Windows PowerShell Fallback
+If you don't have Node.js or Docker installed globally:
+1. Open PowerShell.
+2. Run the native HTTP listener script:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File server/start_server.ps1
+   ```
+3. This boots up a lightweight local listener on port `3000` without Node runtime dependencies.
 
-1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Click **Create API Key**
-3. Copy the generated key and paste it into your `.env` file
+---
+
+## 🧪 Automated Testing
+
+We use **Playwright** for end-to-end integration audits. The test script verifies extension loading, target page navigation, passive header capture, and live backend dashboard syncing.
+
+To run the automated tests:
+1. Install dependencies inside the `server/` directory:
+   ```bash
+   cd server
+   npm install playwright
+   npx playwright install chromium
+   ```
+2. Run the test runner script:
+   ```bash
+   node test_extension.js
+   ```
+
+---
 
 ## 🛠️ Tech Stack
 
@@ -128,16 +147,13 @@ A full-featured web dashboard provides deep-dive analysis capabilities, historic
 | **Extension** | JavaScript | Core extension logic and content scripts |
 | **Extension** | Chrome Extension APIs | Browser integration, tab management, web requests |
 | **Extension** | HTML/CSS | Popup UI and extension pages |
-| **Backend** | Node.js | Server runtime environment |
-| **Backend** | Express | REST API framework |
-| **Database** | SQLite / better-sqlite3 | Local persistent storage for analysis results |
+| **Backend** | Node.js / Express | Server runtime environment & REST API framework |
+| **Fallback Host** | PowerShell Script | Native HTTP listener for lightweight hosting |
 | **AI** | Google Gemini AI | Intelligent risk assessment and threat analysis |
-| **Visualization** | Chart.js | Interactive charts and risk score gauges |
-| **Visualization** | D3.js | Advanced data visualizations and network graphs |
+| **Visualization** | Chart.js | Interactive charts and risk score gauges (hosted locally offline) |
+| **E2E Automation** | Playwright | Browser simulation and integration validation |
 
 ## 🏗️ Architecture
-
-SurfaceQ employs a **three-tier architecture** designed for modularity, performance, and privacy. The **browser extension** serves as the data collection layer, passively intercepting HTTP response headers, extracting technology fingerprints from page content, and capturing SSL/TLS certificate details through Chrome's WebRequest and related APIs. This raw data is transmitted to the **backend server**, a Node.js/Express application running locally on the user's machine, which orchestrates the analysis pipeline. The server processes incoming data through specialized analysis modules (header analysis, SSL evaluation, technology detection, DNS resolution), persists results in a local **SQLite database** via better-sqlite3, and forwards relevant data to the **Google Gemini AI** layer for intelligent risk assessment. The AI engine returns structured assessments including risk scores, vulnerability descriptions, remediation recommendations, and contextual threat intelligence, which are stored alongside the raw analysis data and served to both the extension popup and the interactive web dashboard.
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
@@ -154,78 +170,6 @@ SurfaceQ employs a **three-tier architecture** designed for modularity, performa
 └─────────────────┘     └──────────────────┘
 ```
 
-## 🔐 Privacy & Security
-
-SurfaceQ is committed to protecting your privacy. Here is a clear breakdown of what the platform does and does not access:
-
-### ✅ What We Analyze
-- HTTP security response headers (CSP, HSTS, X-Frame-Options, etc.)
-- SSL/TLS certificate details (issuer, expiry, protocol version, cipher suites)
-- DNS records (A, AAAA, MX, TXT, DMARC, SPF, DNSSEC status)
-- Technology stack fingerprints (frameworks, libraries, CMS, server software)
-- Security risk scores derived from the above data points
-
-### ❌ What We NEVER Collect
-- Passwords or authentication credentials
-- Form data or user input
-- Cookies or session tokens
-- Personally identifiable information (PII)
-- Browsing history or navigation patterns
-- Keystrokes or clipboard content
-- File system access or downloads
-- Microphone, camera, or location data
-
-All analysis results are stored exclusively in a local SQLite database on your machine. The only external network requests made by the server are to the Google Gemini API for AI-powered analysis, and these requests contain only the technical metadata listed above — never any personal or browsing data.
-
-## 📚 Documentation
-
-| Document | Description |
-|----------|-------------|
-| [ROADMAP.md](ROADMAP.md) | Development phases, milestones, and future vision |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, development setup, and code style |
-| [SECURITY.md](SECURITY.md) | Security policy, vulnerability reporting, and data handling |
-| [CHANGELOG.md](CHANGELOG.md) | Version history and release notes |
-| [LICENSE](LICENSE) | MIT License terms |
-
-## 🤝 Contributing
-
-We welcome contributions of all kinds! Whether you're fixing a typo, adding a feature, improving documentation, or suggesting ideas, your help makes SurfaceQ better for everyone.
-
-Please read our [Contributing Guide](CONTRIBUTING.md) for detailed instructions on:
-- Setting up your development environment
-- Our branching and commit message conventions
-- The pull request review process
-- Code style and testing requirements
-
-## 🗺️ Roadmap
-
-SurfaceQ is under active development. See our [ROADMAP.md](ROADMAP.md) for the full development plan, including:
-- **Phase 1**: Foundation — Project setup, scaffolding, and core infrastructure ✅
-- **Phase 2**: Core Features — Header analysis, SSL/TLS, tech detection, risk scoring 🔄
-- **Phase 3**: AI Integration — Gemini-powered analysis and threat intelligence 📋
-- **Phase 4**: Production Polish — Export, comparison, dark mode, CI/CD 📋
-
 ## 📄 License
 
-SurfaceQ is released under the [MIT License](LICENSE). You are free to use, modify, and distribute this software in accordance with the license terms.
-
-## 👥 Team & Credits
-
-**chriz-3656** — This project is built and maintained by a community of security enthusiasts, developers, and researchers who believe that understanding the web's attack surface should be accessible to everyone.
-
-We are grateful to the open-source community and the creators of the technologies that make SurfaceQ possible:
-- [Node.js](https://nodejs.org/) and [Express](https://expressjs.com/) for the backend foundation
-- [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) for fast, synchronous SQLite access
-- [Google Gemini AI](https://ai.google.dev/) for intelligent analysis capabilities
-- [Chart.js](https://www.chartjs.org/) and [D3.js](https://d3js.org/) for data visualization
-- The Chrome Extensions platform for seamless browser integration
-
----
-
-<div align="center">
-
-**Built with 🛡️ by the SurfaceQ community**
-
-[Report a Bug](https://github.com/chriz-3656/Surface-Q/issues) · [Request a Feature](https://github.com/chriz-3656/Surface-Q/issues) · [Security Policy](SECURITY.md)
-
-</div>
+SurfaceQ is released under the [MIT License](LICENSE).
