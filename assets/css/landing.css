@@ -254,6 +254,10 @@ html, body {
   pointer-events: none;
 }
 
+#hero-content {
+  pointer-events: auto;
+}
+
 /* Dashboard Mockup construction */
 .mockup-dashboard {
   transform: perspective(1000px) rotateX(10deg) scale(0.9);
