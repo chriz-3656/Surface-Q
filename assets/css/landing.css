@@ -1,0 +1,323 @@
+/* ============================================================
+   SurfaceQ — Landing Page CSS Architecture
+   Dark cybersecurity theme with glassmorphism, noise, and glow effects
+   ============================================================ */
+
+/* Base overrides and structure */
+html, body {
+  overflow-x: hidden;
+  background-color: #030303;
+  font-family: 'Inter', sans-serif;
+  scroll-behavior: auto !important; /* Disables browser scroll smooth override for ScrollTrigger */
+}
+
+/* Background overlay elements */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+  background-size: 24px 24px;
+  opacity: 0.7;
+}
+
+.glow-backdrop {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(12, 19, 43, 0.4) 0%, rgba(3, 3, 3, 0.95) 70%);
+  transition: background 0.3s ease;
+}
+
+/* Grid background overlay */
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-size: 60px 60px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+}
+
+/* Glass Navbar */
+.nav-glass {
+  background: rgba(3, 3, 3, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+/* Typography styles */
+.editorial-title {
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #ffffff 30%, #a1a1aa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-cyan-purple {
+  background: linear-gradient(135deg, #00f0ff 0%, #7000ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glass buttons */
+.btn-glass {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #ffffff;
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -10px rgba(255, 255, 255, 0.1);
+}
+
+.btn-premium {
+  background: #ffffff;
+  color: #030303;
+  border: 1px solid #ffffff;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-premium:hover {
+  background: transparent;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -10px rgba(255, 255, 255, 0.2);
+}
+
+/* Scroll Storytelling pinning & animations */
+.story-container {
+  position: relative;
+  width: 100%;
+}
+
+.canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.canvas-container canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.story-section {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.story-content {
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(30px);
+  text-align: center;
+  max-width: 800px;
+  padding: 0 24px;
+}
+
+/* Fullscreen Features */
+.feature-fullscreen {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.card-glass {
+  background: rgba(15, 15, 17, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  border-radius: 24px;
+}
+
+/* Specific Feature UI Elements */
+.scanning-terminal {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  background: #060608;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.scanning-line {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.radial-progress-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radial-progress-svg circle {
+  fill: none;
+  stroke-width: 8;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.radial-progress-svg circle.bg {
+  stroke: rgba(255, 255, 255, 0.03);
+}
+
+.radial-progress-svg circle.fg {
+  stroke: url(#cyan-purple-grad);
+  stroke-dasharray: 565;
+  stroke-dashoffset: 565;
+  transition: stroke-dashoffset 0.1s ease;
+}
+
+/* Split Privacy checklist */
+.checklist-item {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.checklist-item.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Technology Badges */
+.tech-badge-container {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  overflow: hidden;
+}
+
+.tech-badge {
+  position: absolute;
+  background: rgba(15, 15, 17, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 9999px;
+  padding: 12px 24px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e4e4e7;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.tech-badge:hover {
+  transform: scale(1.05) translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: var(--hover-shadow, 0 10px 30px rgba(0, 240, 255, 0.2));
+  color: #ffffff;
+}
+
+/* Smooth hidden sections for GSAP pinning */
+.pin-spacer {
+  pointer-events: none;
+}
+
+/* Dashboard Mockup construction */
+.mockup-dashboard {
+  transform: perspective(1000px) rotateX(10deg) scale(0.9);
+  opacity: 0.5;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mockup-dashboard.assembled {
+  transform: perspective(1000px) rotateX(0deg) scale(1);
+  opacity: 1;
+}
+
+.mockup-sidebar {
+  transform: translateX(-30px);
+  opacity: 0;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s, opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+}
+
+.mockup-main {
+  transform: translateY(30px);
+  opacity: 0;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s, opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+}
+
+.mockup-dashboard.assembled .mockup-sidebar,
+.mockup-dashboard.assembled .mockup-main {
+  transform: translate(0) translateY(0);
+  opacity: 1;
+}
+
+/* Custom UI glows */
+.glow-spotlight {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(112, 0, 255, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.glow-cyan-spotlight {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-radial-glow {
+  background: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.08) 0%, transparent 60%);
+}
+
+/* Redesign additions */
+.ai-word {
+  opacity: 0.25;
+  transition: color 0.4s ease, transform 0.4s ease, opacity 0.4s ease;
+}
+
+#dashboard-mockup-zoom {
+  opacity: 1;
+  transform: scale(0.85);
+}
+

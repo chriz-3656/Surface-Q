@@ -9,6 +9,18 @@
   <meta property="og:title" content="SurfaceQ – AI-Powered Attack Surface Intelligence">
   <meta property="og:description" content="SurfaceQ is an open-source AI-powered browser extension for passive attack surface analysis and security intelligence.">
   <meta property="og:type" content="website">
+  <script>
+    // Suppress cdn.tailwindcss.com warnings in console
+    (function() {
+      const originalWarn = console.warn;
+      console.warn = function(...args) {
+        if (args[0] && typeof args[0] === 'string' && (args[0].includes('cdn.tailwindcss.com') || args[0].includes('tailwindcss.com'))) {
+          return;
+        }
+        originalWarn.apply(console, args);
+      };
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/main.css">
@@ -146,202 +158,182 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <section class="relative z-10 min-h-screen flex items-center justify-center text-center pt-32 pb-20 px-6">
-    <div class="max-w-5xl mx-auto">
-      <!-- Badge -->
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-sq-border glow-badge mb-8">
-        <span class="w-2 h-2 rounded-full bg-sq-cyan animate-pulse"></span>
-        <span class="text-sm text-gray-300 font-medium">Open Source Security Platform</span>
-      </div>
+  <!-- Hero Pinned Container -->
+  <div id="hero-pin-container" class="relative w-full h-screen overflow-hidden z-10 bg-black">
+    <!-- Canvas background system -->
+    <div class="absolute inset-0 w-full h-full overflow-hidden select-none pointer-events-none">
+      <canvas id="hero-frame-canvas" class="absolute inset-0 w-full h-full block object-cover z-0"></canvas>
+      <!-- Gradient overlay and soft blue glow -->
+      <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/85 to-[#030303] z-20"></div>
+      <div class="absolute inset-0 hero-radial-glow z-20"></div>
+    </div>
 
-      <!-- Heading -->
-      <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6">
-        <span class="gradient-text">AI-Powered Attack<br>Surface Intelligence</span>
-      </h1>
+    <!-- Hero Content Overlay -->
+    <div id="hero-content" class="relative z-30 h-full w-full flex items-center justify-center pt-20 px-6">
+      <div class="max-w-5xl mx-auto text-center">
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/5 bg-white/[0.02] backdrop-blur-md mb-8">
+          <span class="w-2.5 h-2.5 rounded-full bg-sq-cyan animate-pulse"></span>
+          <span class="text-xs uppercase tracking-widest text-gray-300 font-semibold font-mono">Open Source Security Platform</span>
+        </div>
 
-      <!-- Subtitle -->
-      <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-        Understand the security posture of any website in real-time. Passive analysis. AI-powered insights. Zero data collection.
-      </p>
+        <!-- Heading -->
+        <h1 class="text-5xl md:text-8xl font-black leading-none mb-6 editorial-title">
+          <span class="gradient-text">AI-Powered Attack</span><br>
+          <span class="gradient-cyan-purple">Surface Intelligence</span>
+        </h1>
 
-      <!-- Buttons -->
-      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-        <a href="dashboard.html" class="btn-gradient text-white font-semibold rounded-full px-8 py-3.5 text-base inline-flex items-center justify-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
-          Launch Dashboard
-        </a>
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn-ghost text-white font-semibold rounded-full px-8 py-3.5 text-base inline-flex items-center justify-center gap-2">
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
-          </svg>
-          View on GitHub
-        </a>
-      </div>
+        <!-- Subtitle -->
+        <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+          Passively audit the security posture of any website in real-time. No active scans, no footprints, zero data collection.
+        </p>
 
-      <!-- Terminal Window -->
-      <div class="max-w-2xl mx-auto">
-        <div class="bg-sq-surface border border-sq-border rounded-2xl overflow-hidden shadow-2xl">
-          <!-- Terminal Top Bar -->
-          <div class="flex items-center gap-2 px-4 py-3 border-b border-sq-border">
-            <span class="w-3 h-3 rounded-full bg-red-500"></span>
-            <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
-            <span class="w-3 h-3 rounded-full bg-green-500"></span>
-            <span class="text-xs text-gray-500 ml-2 font-mono">surfaceq — terminal</span>
-          </div>
-          <!-- Terminal Content -->
-          <div class="p-6 font-mono text-sm text-left space-y-1.5">
-            <div class="terminal-line">
-              <span class="text-gray-400">$</span> <span class="text-sq-cyan">surfaceq</span> <span class="text-gray-300">scan chriz-3656.github.io</span>
-            </div>
-            <div class="terminal-line text-green-400">
-              ✓ Headers analyzed <span class="text-gray-500">(4 issues found)</span>
-            </div>
-            <div class="terminal-line text-green-400">
-              ✓ SSL/TLS verified <span class="text-gray-500">(Grade A)</span>
-            </div>
-            <div class="terminal-line text-green-400">
-              ✓ Technologies detected: <span class="text-gray-300">React, Node.js, Cloudflare</span>
-            </div>
-            <div class="terminal-line text-green-400">
-              ✓ Attack surface mapped <span class="text-gray-500">(12 endpoints)</span>
-            </div>
-            <div class="terminal-line text-yellow-400">
-              ⚠ Risk Score: <span class="text-white font-semibold">42/100</span> <span class="text-yellow-500">(Medium)</span>
-            </div>
-            <div class="terminal-line mt-2">
-              <span class="text-gray-500 animate-pulse">█</span>
-            </div>
-          </div>
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="dashboard.html" class="btn-premium px-9 py-4 rounded-full font-bold tracking-tight inline-flex items-center justify-center gap-2">
+            Launch Dashboard
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn-glass px-9 py-4 rounded-full font-bold tracking-tight inline-flex items-center justify-center gap-2 border border-sq-border">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+            </svg>
+            GitHub
+          </a>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
   <!-- Features Section -->
-  <section id="features" class="relative z-10 py-24 px-6">
+  <section id="features" class="relative z-10 py-28 px-6 bg-[#030303]">
     <div class="max-w-7xl mx-auto">
-      <!-- Section Title -->
-      <div class="text-center mb-16">
-        <h2 class="text-4xl md:text-5xl font-extrabold mb-4">
-          <span class="gradient-text">Powerful Security Features</span>
+      <div class="text-center mb-20">
+        <div class="inline-block px-3 py-1 rounded-full bg-white/[0.02] border border-white/5 text-[10px] font-mono tracking-widest text-sq-cyan uppercase mb-4">
+          Core Capabilities
+        </div>
+        <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-4">
+          <span class="gradient-text">Security Capabilities.</span>
         </h2>
-        <p class="text-gray-400 text-lg max-w-xl mx-auto">Everything you need to understand and monitor attack surfaces.</p>
+        <p class="text-gray-400 text-base md:text-lg max-w-xl mx-auto leading-relaxed">Everything you need to passively analyze, scan, and monitor attack surfaces.</p>
       </div>
 
-      <!-- Cards Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Card 1: Passive Scanning -->
-        <div class="feature-card bg-sq-surface border border-sq-border rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 flex items-center justify-center mb-5">
-            <svg class="w-6 h-6 text-sq-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        <div class="feature-card card-glass p-8 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-sq-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-12 h-12 rounded-xl bg-sq-cyan/10 border border-sq-cyan/20 flex items-center justify-center mb-6 relative z-10">
+            <svg class="w-5 h-5 text-sq-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-3 text-white">Passive Scanning</h3>
-          <p class="text-gray-400 leading-relaxed">Analyzes only publicly available information without sending intrusive requests or probes.</p>
+          <h3 class="text-xl font-bold mb-3 text-white relative z-10">Passive Scanning</h3>
+          <p class="text-gray-400 text-sm leading-relaxed relative z-10">Analyzes publicly broadcasted headers, security policies, and third-party script links without invasive network probes.</p>
         </div>
 
-        <!-- Card 2: AI Analysis -->
-        <div class="feature-card bg-sq-surface border border-sq-border rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 flex items-center justify-center mb-5">
-            <svg class="w-6 h-6 text-sq-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+        <!-- Card 2: Dual-AI Evaluation -->
+        <div class="feature-card card-glass p-8 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-sq-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-12 h-12 rounded-xl bg-sq-purple/10 border border-sq-purple/20 flex items-center justify-center mb-6 relative z-10">
+            <svg class="w-5 h-5 text-sq-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-3 text-white">AI Analysis</h3>
-          <p class="text-gray-400 leading-relaxed">Groq-powered AI analyzes findings and provides actionable security recommendations.</p>
+          <h3 class="text-xl font-bold mb-3 text-white relative z-10">Gemini & Groq Dual-AI</h3>
+          <p class="text-gray-400 text-sm leading-relaxed relative z-10">Evaluates security posture profiles using Google Gemini and Groq AI (Llama 3.3) for automated remediation guides.</p>
         </div>
 
-        <!-- Card 3: Attack Surface Map -->
-        <div class="feature-card bg-sq-surface border border-sq-border rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center mb-5">
-            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 10v4M17 10v4M10 7h4M10 17h4"/>
+        <!-- Card 3: Interactive Threat Chat -->
+        <div class="feature-card card-glass p-8 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-sq-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-12 h-12 rounded-xl bg-sq-cyan/10 border border-sq-cyan/20 flex items-center justify-center mb-6 relative z-10">
+            <svg class="w-5 h-5 text-sq-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-3 text-white">Attack Surface Map</h3>
-          <p class="text-gray-400 leading-relaxed">Interactive graph visualization of domains, endpoints, assets, and their relationships.</p>
+          <h3 class="text-xl font-bold mb-3 text-white relative z-10">Interactive Threat Chat</h3>
+          <p class="text-gray-400 text-sm leading-relaxed relative z-10">Direct conversational chat with SurfaceQ AI in the dashboard to request vulnerability mitigations and CSP configs.</p>
         </div>
 
-        <!-- Card 4: Risk Scoring -->
-        <div class="feature-card bg-sq-surface border border-sq-border rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-green-500/5 flex items-center justify-center mb-5">
-            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        <!-- Card 4: Simple & Expert Audits -->
+        <div class="feature-card card-glass p-8 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mb-6 relative z-10">
+            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-3 text-white">Risk Scoring</h3>
-          <p class="text-gray-400 leading-relaxed">Real-time security scoring based on multiple factors including headers, SSL, and technologies.</p>
+          <h3 class="text-xl font-bold mb-3 text-white relative z-10">Simple & Expert Audits</h3>
+          <p class="text-gray-400 text-sm leading-relaxed relative z-10">Toggles dashboard metrics between clear, color-coded risk ratings (Simple) and technical headers/JSON lists (Expert).</p>
         </div>
 
-        <!-- Card 5: Report Generation -->
-        <div class="feature-card bg-sq-surface border border-sq-border rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-500/5 flex items-center justify-center mb-5">
-            <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        <!-- Card 5: Infrastructure Diagnostics -->
+        <div class="feature-card card-glass p-8 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mb-6 relative z-10">
+            <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-3 text-white">Report Generation</h3>
-          <p class="text-gray-400 leading-relaxed">Export comprehensive reports in PDF, Markdown, and JSON formats.</p>
+          <h3 class="text-xl font-bold mb-3 text-white relative z-10">Dynamic Site Diagnostics</h3>
+          <p class="text-gray-400 text-sm leading-relaxed relative z-10">Automated classification heuristics tracing dynamic Server-side SSR routing cookies vs. static CDN configurations.</p>
         </div>
 
-        <!-- Card 6: Privacy First -->
-        <div class="feature-card bg-sq-surface border border-sq-border rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500/20 to-rose-500/5 flex items-center justify-center mb-5">
-            <svg class="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        <!-- Card 6: Privacy First Architecture -->
+        <div class="feature-card card-glass p-8 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-6 relative z-10">
+            <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold mb-3 text-white">Privacy First</h3>
-          <p class="text-gray-400 leading-relaxed">Never collects, stores, or transmits sensitive data. Everything stays in your browser.</p>
+          <h3 class="text-xl font-bold mb-3 text-white relative z-10">Privacy First Architecture</h3>
+          <p class="text-gray-400 text-sm leading-relaxed relative z-10">Stores all logs and scanned domain footprints locally. Zero remote telemetry is ingested during checking.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- How It Works Section -->
-  <section id="how-it-works" class="relative z-10 py-24 px-6" style="background: linear-gradient(180deg, rgba(10, 14, 26, 0.5) 0%, rgba(5, 8, 22, 0.5) 100%);">
+  <section id="how-it-works" class="relative z-10 py-28 px-6 bg-[#030303] border-t border-white/5">
     <div class="max-w-5xl mx-auto">
-      <!-- Section Title -->
-      <div class="text-center mb-16">
-        <h2 class="text-4xl md:text-5xl font-extrabold mb-4">
-          <span class="gradient-text">Get Started in Minutes</span>
+      <div class="text-center mb-20">
+        <div class="inline-block px-3 py-1 rounded-full bg-white/[0.02] border border-white/5 text-[10px] font-mono tracking-widest text-sq-cyan uppercase mb-4">
+          Onboarding
+        </div>
+        <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-4">
+          <span class="gradient-text">How It Works.</span>
         </h2>
-        <p class="text-gray-400 text-lg max-w-xl mx-auto">Three simple steps to start analyzing attack surfaces.</p>
+        <p class="text-gray-400 text-base md:text-lg max-w-xl mx-auto leading-relaxed">Three simple steps to start analyzing attack surfaces natively in your browser.</p>
       </div>
 
-      <!-- Steps -->
-      <div class="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-12 md:gap-0">
-        <!-- Connector Line (desktop only) -->
-        <div class="hidden md:block absolute top-1/2 left-[15%] right-[15%] step-connector -translate-y-1/2"></div>
-
+      <!-- Steps Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Step 1 -->
-        <div class="relative flex-1 text-center px-4">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sq-surface border border-sq-border mb-6 relative z-10">
-            <span class="text-2xl font-extrabold text-sq-cyan">01</span>
+        <div class="how-step text-center card-glass p-8 relative">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sq-cyan/10 border border-sq-cyan/20 mb-6">
+            <span class="text-2xl font-black text-sq-cyan">01</span>
           </div>
           <h3 class="text-lg font-bold text-white mb-2">Install Extension</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Add SurfaceQ to your browser from the Chrome Web Store.</p>
+          <p class="text-gray-400 text-sm leading-relaxed">Add SurfaceQ extension to your profile directly from Chrome Web Store.</p>
         </div>
 
         <!-- Step 2 -->
-        <div class="relative flex-1 text-center px-4">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sq-surface border border-sq-border mb-6 relative z-10">
-            <span class="text-2xl font-extrabold text-sq-cyan">02</span>
+        <div class="how-step text-center card-glass p-8 relative">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sq-cyan/10 border border-sq-cyan/20 mb-6">
+            <span class="text-2xl font-black text-sq-cyan">02</span>
           </div>
           <h3 class="text-lg font-bold text-white mb-2">Visit Any Website</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Navigate to any website you want to analyze.</p>
+          <p class="text-gray-400 text-sm leading-relaxed">Navigate to any domain you want to audit natively in a browser tab.</p>
         </div>
 
         <!-- Step 3 -->
-        <div class="relative flex-1 text-center px-4">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sq-surface border border-sq-border mb-6 relative z-10">
-            <span class="text-2xl font-extrabold text-sq-cyan">03</span>
+        <div class="how-step text-center card-glass p-8 relative">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sq-cyan/10 border border-sq-cyan/20 mb-6">
+            <span class="text-2xl font-black text-sq-cyan">03</span>
           </div>
           <h3 class="text-lg font-bold text-white mb-2">Get Insights</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Receive instant AI-powered security analysis and recommendations.</p>
@@ -364,9 +356,10 @@
       <!-- Two Columns -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Left: What We Analyze (Green) -->
-        <div class="bg-sq-surface border border-sq-border rounded-2xl p-8">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
+        <div class="privacy-card card-glass p-8 md:p-10 border-green-500/10 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-green-500/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="flex items-center gap-3.5 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center border border-green-500/20">
               <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
@@ -374,49 +367,50 @@
             <h3 class="text-xl font-bold text-green-400">What We Analyze</h3>
           </div>
           <ul class="space-y-4">
-            <li class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <li class="flex items-center gap-3.5 checklist-item">
+              <svg class="w-5 h-5 text-green-400 flex-shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
               </svg>
-              <span class="text-gray-300">HTTP headers</span>
+              <span class="text-gray-300">HTTP headers (CSP, HSTS, security flags)</span>
             </li>
-            <li class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <li class="flex items-center gap-3.5 checklist-item">
+              <svg class="w-5 h-5 text-green-400 flex-shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
               </svg>
-              <span class="text-gray-300">SSL certificates</span>
+              <span class="text-gray-300">SSL certificates (expiration, encryption keys)</span>
             </li>
-            <li class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <li class="flex items-center gap-3.5 checklist-item">
+              <svg class="w-5 h-5 text-green-400 flex-shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
               </svg>
-              <span class="text-gray-300">DOM structure</span>
+              <span class="text-gray-300">DOM structure & visible tags</span>
             </li>
-            <li class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <li class="flex items-center gap-3.5 checklist-item">
+              <svg class="w-5 h-5 text-green-400 flex-shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
               </svg>
-              <span class="text-gray-300">Script sources</span>
+              <span class="text-gray-300">Script sources & external references</span>
             </li>
-            <li class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <li class="flex items-center gap-3.5 checklist-item">
+              <svg class="w-5 h-5 text-green-400 flex-shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
               </svg>
-              <span class="text-gray-300">Meta tags</span>
+              <span class="text-gray-300">Meta tags and SEO fields</span>
             </li>
-            <li class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <li class="flex items-center gap-3.5 checklist-item">
+              <svg class="w-5 h-5 text-green-400 flex-shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
               </svg>
-              <span class="text-gray-300">Technology fingerprints</span>
+              <span class="text-gray-300">Technology fingerprints and versions</span>
             </li>
           </ul>
         </div>
 
         <!-- Right: What We Never Collect (Red) -->
-        <div class="bg-sq-surface border border-sq-border rounded-2xl p-8">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+        <div class="privacy-card card-glass p-8 md:p-10 border-red-500/10 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-red-500/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="flex items-center gap-3.5 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center border border-red-500/20">
               <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
               </svg>
@@ -424,41 +418,41 @@
             <h3 class="text-xl font-bold text-red-400">What We Never Collect</h3>
           </div>
           <ul class="space-y-4">
-            <li class="flex items-center gap-3">
+            <li class="flex items-center gap-3.5 checklist-item">
               <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
               </svg>
-              <span class="text-gray-300">Passwords or credentials</span>
+              <span class="text-gray-300">Passwords or login credentials</span>
             </li>
-            <li class="flex items-center gap-3">
+            <li class="flex items-center gap-3.5 checklist-item">
               <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
               </svg>
-              <span class="text-gray-300">Personal data</span>
+              <span class="text-gray-300">Personal identity variables (PII)</span>
             </li>
-            <li class="flex items-center gap-3">
+            <li class="flex items-center gap-3.5 checklist-item">
               <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
               </svg>
-              <span class="text-gray-300">Cookies or sessions</span>
+              <span class="text-gray-300">Cookies, auth sessions, or local storage</span>
             </li>
-            <li class="flex items-center gap-3">
+            <li class="flex items-center gap-3.5 checklist-item">
               <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
               </svg>
-              <span class="text-gray-300">Form submissions</span>
+              <span class="text-gray-300">Form inputs and database queries</span>
             </li>
-            <li class="flex items-center gap-3">
+            <li class="flex items-center gap-3.5 checklist-item">
               <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
               </svg>
-              <span class="text-gray-300">Network traffic</span>
+              <span class="text-gray-300">Browser extensions telemetry traffic</span>
             </li>
-            <li class="flex items-center gap-3">
+            <li class="flex items-center gap-3.5 checklist-item">
               <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
               </svg>
-              <span class="text-gray-300">Authentication tokens</span>
+              <span class="text-gray-300">Authentication tokens and access keys</span>
             </li>
           </ul>
         </div>
@@ -467,54 +461,47 @@
   </section>
 
   <!-- Tech Stack Section -->
-  <section id="tech-stack" class="relative z-10 py-24 px-6" style="background: linear-gradient(180deg, rgba(10, 14, 26, 0.3) 0%, rgba(5, 8, 22, 0.3) 100%);">
+  <section id="tech-stack" class="relative z-10 py-28 px-6 bg-[#030303] border-t border-white/5">
     <div class="max-w-4xl mx-auto text-center">
-      <h2 class="text-3xl md:text-4xl font-extrabold mb-4">
-        <span class="gradient-text">Built With Modern Tech</span>
-      </h2>
-      <p class="text-gray-400 text-lg mb-12">Powered by cutting-edge tools and frameworks.</p>
+      <div class="text-center mb-16">
+        <div class="inline-block px-3 py-1 rounded-full bg-white/[0.02] border border-white/5 text-[10px] font-mono tracking-widest text-sq-purple uppercase mb-4">
+          Frameworks
+        </div>
+        <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-4">
+          <span class="gradient-text">Built With Modern Tech.</span>
+        </h2>
+        <p class="text-gray-400 text-base md:text-lg max-w-xl mx-auto leading-relaxed">SurfaceQ integrates low-level browser APIs with high-level AI analysis engines.</p>
+      </div>
 
       <div class="flex flex-wrap justify-center gap-4">
         <!-- JavaScript -->
-        <span class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sq-surface border border-sq-border text-sm font-medium text-gray-300 hover:border-yellow-500/30 hover:text-yellow-400 transition-all duration-200">
-          <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M0 0h24v24H0V0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.404-.601-.586-.78-.63-.705-1.469-1.065-2.834-1.034l-.705.089c-.676.165-1.32.525-1.71 1.005-1.14 1.291-.811 3.541.569 4.471 1.365 1.02 3.361 1.244 3.616 2.205.24 1.17-.87 1.545-1.966 1.41-.811-.18-1.26-.586-1.755-1.336l-1.83 1.051c.21.48.45.689.81 1.109 1.74 1.756 6.09 1.666 6.871-1.004.029-.09.24-.705.074-1.65l.046.067zm-8.983-7.245h-2.248c0 1.938-.009 3.864-.009 5.805 0 1.232.063 2.363-.138 2.711-.33.689-1.18.601-1.566.48-.396-.196-.597-.466-.83-.855-.063-.105-.11-.196-.127-.196l-1.825 1.125c.305.63.75 1.172 1.324 1.517.855.51 2.004.675 3.207.405.783-.226 1.458-.691 1.811-1.411.51-.93.402-2.07.397-3.346.012-2.054 0-4.109 0-6.179l.004-.056z"/>
-          </svg>
-          JavaScript
+        <span class="tech-badge-inline inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.02] border border-white/5 text-sm font-medium text-gray-300 hover:border-yellow-500/30 hover:text-yellow-400 transition-all duration-200 cursor-pointer">
+          <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+          JavaScript (ES6)
         </span>
         <!-- Chrome Extension -->
-        <span class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sq-surface border border-sq-border text-sm font-medium text-gray-300 hover:border-blue-500/30 hover:text-blue-400 transition-all duration-200">
-          <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
-          </svg>
-          Chrome Extension
+        <span class="tech-badge-inline inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.02] border border-white/5 text-sm font-medium text-gray-300 hover:border-blue-500/30 hover:text-blue-400 transition-all duration-200 cursor-pointer">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+          Chrome Extension API
         </span>
         <!-- Groq AI -->
-        <span class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sq-surface border border-sq-border text-sm font-medium text-gray-300 hover:border-purple-500/30 hover:text-purple-400 transition-all duration-200">
-          <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
-          Groq AI
+        <span class="tech-badge-inline inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.02] border border-white/5 text-sm font-medium text-gray-300 hover:border-purple-500/30 hover:text-purple-400 transition-all duration-200 cursor-pointer">
+          <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+          Google Gemini AI
         </span>
-        <!-- Cytoscape.js -->
-        <span class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sq-surface border border-sq-border text-sm font-medium text-gray-300 hover:border-cyan-500/30 hover:text-cyan-400 transition-all duration-200">
-          <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/>
-          </svg>
-          Cytoscape.js
+        <!-- Express -->
+        <span class="tech-badge-inline inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.02] border border-white/5 text-sm font-medium text-gray-300 hover:border-cyan-500/30 hover:text-cyan-400 transition-all duration-200 cursor-pointer">
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span>
+          Express.js Engine
         </span>
-        <!-- Chart.js -->
-        <span class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sq-surface border border-sq-border text-sm font-medium text-gray-300 hover:border-green-500/30 hover:text-green-400 transition-all duration-200">
-          <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-          </svg>
-          Chart.js
+        <!-- SQLite -->
+        <span class="tech-badge-inline inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.02] border border-white/5 text-sm font-medium text-gray-300 hover:border-green-500/30 hover:text-green-400 transition-all duration-200 cursor-pointer">
+          <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+          SQLite Local DB
         </span>
         <!-- Web Components -->
-        <span class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sq-surface border border-sq-border text-sm font-medium text-gray-300 hover:border-orange-500/30 hover:text-orange-400 transition-all duration-200">
-          <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-          </svg>
+        <span class="tech-badge-inline inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.02] border border-white/5 text-sm font-medium text-gray-300 hover:border-orange-500/30 hover:text-orange-400 transition-all duration-200 cursor-pointer">
+          <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
           Web Components
         </span>
       </div>
@@ -602,6 +589,12 @@
       });
     });
   </script>
+
+  <!-- GSAP and ScrollTrigger -->
+  <script src="assets/js/vendor/gsap.min.js"></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js"></script>
+  <!-- Landing page logic -->
+  <script src="assets/js/landing.js" defer></script>
 
 </body>
 </html>
