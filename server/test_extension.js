@@ -40,6 +40,10 @@ const path = require('path');
     const popupPage = await browserContext.newPage();
     await popupPage.goto(`chrome-extension://${extensionId}/popup.html`);
 
+    // Switch to Expert Mode to reveal the JSON result-box viewport
+    console.log('Switching popup to Expert Mode...');
+    await popupPage.click('#toggle-mode-btn');
+
     // 4. Trigger Scan inside Popup
     console.log('3. Triggering scan button inside popup...');
     await popupPage.click('#scan-btn');

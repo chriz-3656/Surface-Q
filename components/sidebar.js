@@ -11,6 +11,10 @@ class SQSidebar extends HTMLElement {
   }
 
   connectedCallback() {
+    const mode = localStorage.getItem('userMode') || 'simple';
+    document.body.classList.remove('mode-simple', 'mode-expert');
+    document.body.classList.add('mode-' + mode);
+
     this.render();
     this._detectActivePage();
     this._bindEvents();
@@ -34,129 +38,46 @@ class SQSidebar extends HTMLElement {
   }
 
   _getNavItems() {
-    return [
-      {
-        label: 'Dashboard',
-        href: 'dashboard.html',
-        icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="1" y="1" width="4" height="4" rx="0.5"/>
-          <rect x="6" y="1" width="4" height="4" rx="0.5"/>
-          <rect x="11" y="1" width="4" height="4" rx="0.5"/>
-          <rect x="1" y="6" width="4" height="4" rx="0.5"/>
-          <rect x="6" y="6" width="4" height="4" rx="0.5"/>
-          <rect x="11" y="6" width="4" height="4" rx="0.5"/>
-          <rect x="1" y="11" width="4" height="4" rx="0.5"/>
-          <rect x="6" y="11" width="4" height="4" rx="0.5"/>
-          <rect x="11" y="11" width="4" height="4" rx="0.5"/>
-        </svg>`
-      },
-      {
-        label: 'Threat Feed',
-        href: 'dashboard.html#threats',
-        icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M7.134 1.504a1 1 0 0 1 1.732 0l5.857 10.14a1 1 0 0 1-.866 1.506H2.143a1 1 0 0 1-.866-1.506l5.857-10.14z"/>
-          <line x1="8" y1="5.5" x2="8" y2="8.5"/>
-          <circle cx="8" cy="10.5" r="0.5" fill="currentColor" stroke="none"/>
-        </svg>`
-      },
-      {
-        label: 'Attack Surface',
-        href: 'attack-map.html',
-        icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="8" cy="8" r="6.5"/>
-          <ellipse cx="8" cy="8" rx="3" ry="6.5"/>
-          <line x1="1.5" y1="8" x2="14.5" y2="8"/>
-          <path d="M2.5 4.5h11"/>
-          <path d="M2.5 11.5h11"/>
-        </svg>`
-      },
-      {
-        label: 'Endpoints',
-        href: 'dashboard.html#endpoints',
-        icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6.5 9.5L2.2 13.8"/>
-          <path d="M9.5 6.5L13.8 2.2"/>
-          <circle cx="4.5" cy="11.5" r="2"/>
-          <circle cx="11.5" cy="4.5" r="2"/>
-        </svg>`
-      },
-      {
-        label: 'Assets',
-        href: 'dashboard.html#assets',
-        icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="8,1.5 14.5,5 14.5,5 8,8.5 1.5,5"/>
-          <polyline points="1.5,8 8,11.5 14.5,8"/>
-          <polyline points="1.5,11 8,14.5 14.5,11"/>
-        </svg>`
-      },
-      {
-        label: 'Forms',
-        href: 'dashboard.html#forms',
-        icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10 1.5H3.5a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V5L10 1.5z"/>
-          <polyline points="10,1.5 10,5 13.5,5"/>
-          <line x1="5" y1="8" x2="11" y2="8"/>
-          <line x1="5" y1="10.5" x2="11" y2="10.5"/>
-          <line x1="5" y1="5.5" x2="7" y2="5.5"/>
-        </svg>`
-      },
-      {
-        label: 'Technologies',
-        href: 'dashboard.html#tech',
-        icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="2" width="12" height="12" rx="1.5"/>
-          <line x1="8" y1="2" x2="8" y2="14"/>
-          <line x1="2" y1="8" x2="14" y2="8"/>
-          <circle cx="5" cy="5" r="1" fill="currentColor" stroke="none"/>
-          <circle cx="11" cy="5" r="1" fill="currentColor" stroke="none"/>
-          <circle cx="5" cy="11" r="1" fill="currentColor" stroke="none"/>
-          <circle cx="11" cy="11" r="1" fill="currentColor" stroke="none"/>
-          <line x1="5" y1="6" x2="5" y2="7"/>
-          <line x1="11" y1="6" x2="11" y2="7"/>
-          <line x1="5" y1="9" x2="5" y2="10"/>
-          <line x1="11" y1="9" x2="11" y2="10"/>
-          <line x1="6" y1="5" x2="7" y2="5"/>
-          <line x1="9" y1="5" x2="10" y2="5"/>
-          <line x1="6" y1="11" x2="7" y2="11"/>
-          <line x1="9" y1="11" x2="10" y2="11"/>
-        </svg>`
-      },
-      {
-        label: 'Reports',
-        href: 'reports.html',
-        icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="14" y1="14.5" x2="14" y2="5.5"/>
-          <line x1="10" y1="14.5" x2="10" y2="1.5"/>
-          <line x1="6" y1="14.5" x2="6" y2="8.5"/>
-          <line x1="2" y1="14.5" x2="2" y2="11.5"/>
-        </svg>`
-      },
-      {
-        label: 'History',
-        href: 'history.html',
-        icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="8" cy="8" r="6.5"/>
-          <polyline points="8,4 8,8 11,10"/>
-        </svg>`
-      },
-      {
-        label: 'AI Assistant',
-        href: 'dashboard.html#ai',
-        icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 1l1.2 3.1L12.5 5l-2.5 2.3.7 3.5L8 9.1 5.3 10.8l.7-3.5L3.5 5l3.3-.9L8 1z"/>
-          <path d="M3 12.5l.6 1.5 1.6.5-1.2 1.1.3 1.7L3 16.5l-1.3.8.3-1.7L.8 14.5l1.6-.5L3 12.5z" transform="scale(0.7) translate(1,2)"/>
-          <path d="M13 11l.5 1.2 1.3.4-1 .9.2 1.4-1.1-.6-1.1.6.2-1.4-1-.9 1.3-.4L13 11z" transform="scale(0.7) translate(5,3)"/>
-        </svg>`
-      },
-      {
-        label: 'Settings',
-        href: 'settings.html',
-        icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="8" cy="8" r="2.5"/>
-          <path d="M13.3 10a1.2 1.2 0 0 0 .2 1.3l.04.04a1.44 1.44 0 1 1-2.04 2.04l-.04-.04a1.2 1.2 0 0 0-1.3-.2 1.2 1.2 0 0 0-.72 1.08v.12a1.44 1.44 0 1 1-2.88 0v-.06A1.2 1.2 0 0 0 5.8 13.3a1.2 1.2 0 0 0-1.3.2l-.04.04a1.44 1.44 0 1 1-2.04-2.04l.04-.04a1.2 1.2 0 0 0 .2-1.3 1.2 1.2 0 0 0-1.08-.72h-.12a1.44 1.44 0 0 1 0-2.88h.06A1.2 1.2 0 0 0 2.7 5.8a1.2 1.2 0 0 0-.2-1.3l-.04-.04a1.44 1.44 0 1 1 2.04-2.04l.04.04a1.2 1.2 0 0 0 1.3.2h.06a1.2 1.2 0 0 0 .72-1.08v-.12a1.44 1.44 0 1 1 2.88 0v.06a1.2 1.2 0 0 0 .72.84 1.2 1.2 0 0 0 1.3-.2l.04-.04a1.44 1.44 0 1 1 2.04 2.04l-.04.04a1.2 1.2 0 0 0-.2 1.3v.06a1.2 1.2 0 0 0 1.08.72h.12a1.44 1.44 0 0 1 0 2.88h-.06a1.2 1.2 0 0 0-.84.72z" transform="scale(0.55) translate(3.5,3.5)"/>
-        </svg>`
-      }
-    ];
+    const mode = localStorage.getItem('userMode') || 'simple';
+    const icons = {
+      dashboard: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="4" height="4" rx="0.5"/><rect x="6" y="1" width="4" height="4" rx="0.5"/><rect x="11" y="1" width="4" height="4" rx="0.5"/><rect x="1" y="6" width="4" height="4" rx="0.5"/><rect x="6" y="6" width="4" height="4" rx="0.5"/><rect x="11" y="6" width="4" height="4" rx="0.5"/><rect x="1" y="11" width="4" height="4" rx="0.5"/><rect x="6" y="11" width="4" height="4" rx="0.5"/><rect x="11" y="11" width="4" height="4" rx="0.5"/></svg>`,
+      check: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>`,
+      threats: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.134 1.504a1 1 0 0 1 1.732 0l5.857 10.14a1 1 0 0 1-.866 1.506H2.143a1 1 0 0 1-.866-1.506l5.857-10.14z"/><line x1="8" y1="5.5" x2="8" y2="8.5"/><circle cx="8" cy="10.5" r="0.5" fill="currentColor" stroke="none"/></svg>`,
+      attack: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><ellipse cx="8" cy="8" rx="3" ry="6.5"/><line x1="1.5" y1="8" x2="14.5" y2="8"/><path d="M2.5 4.5h11"/><path d="M2.5 11.5h11"/></svg>`,
+      endpoints: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 9.5L2.2 13.8"/><path d="M9.5 6.5L13.8 2.2"/><circle cx="4.5" cy="11.5" r="2"/><circle cx="11.5" cy="4.5" r="2"/></svg>`,
+      assets: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="8,1.5 14.5,5 14.5,5 8,8.5 1.5,5"/><polyline points="1.5,8 8,11.5 14.5,8"/><polyline points="1.5,11 8,14.5 14.5,11"/></svg>`,
+      forms: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 1.5H3.5a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V5L10 1.5z"/><polyline points="10,1.5 10,5 13.5,5"/><line x1="5" y1="8" x2="11" y2="8"/><line x1="5" y1="10.5" x2="11" y2="10.5"/><line x1="5" y1="5.5" x2="7" y2="5.5"/></svg>`,
+      tech: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="1.5"/><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/><circle cx="5" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="11" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="5" cy="11" r="1" fill="currentColor" stroke="none"/><circle cx="11" cy="11" r="1" fill="currentColor" stroke="none"/></svg>`,
+      reports: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="14" y1="14.5" x2="14" y2="5.5"/><line x1="10" y1="14.5" x2="10" y2="1.5"/><line x1="6" y1="14.5" x2="6" y2="8.5"/><line x1="2" y1="14.5" x2="2" y2="11.5"/></svg>`,
+      history: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><polyline points="8,4 8,8 11,10"/></svg>`,
+      ai: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1l1.2 3.1L12.5 5l-2.5 2.3.7 3.5L8 9.1 5.3 10.8l.7-3.5L3.5 5l3.3-.9L8 1z"/></svg>`,
+      settings: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.5"/><path d="M13.3 10a1.2 1.2 0 0 0 .2 1.3l.04.04a1.44 1.44 0 1 1-2.04 2.04l-.04-.04a1.2 1.2 0 0 0-1.3-.2a1.2 1.2 0 0 0-.72 1.08v.12a1.44 1.44 0 1 1-2.88 0v-.06A1.2 1.2 0 0 0 5.8 13.3a1.2 1.2 0 0 0-1.3.2l-.04.04a1.44 1.44 0 1 1-2.04-2.04l.04-.04a1.2 1.2 0 0 0 .2-1.3 1.2 1.2 0 0 0-1.08-.72h-.12a1.44 1.44 0 0 1 0-2.88h.06A1.2 1.2 0 0 0 2.7 5.8a1.2 1.2 0 0 0-.2-1.3l-.04-.04a1.44 1.44 0 1 1 2.04-2.04l.04.04a1.2 1.2 0 0 0 1.3.2h.06" transform="scale(0.55) translate(3.5,3.5)"/></svg>`
+    };
+
+    if (mode === 'simple') {
+      return [
+        { label: 'Dashboard', href: 'dashboard.html', icon: icons.dashboard },
+        { label: 'Website Check', href: 'dashboard.html#check', icon: icons.check },
+        { label: 'History', href: 'history.html', icon: icons.history },
+        { label: 'Reports', href: 'reports.html', icon: icons.reports },
+        { label: 'AI Assistant', href: 'dashboard.html#ai', icon: icons.ai },
+        { label: 'Settings', href: 'settings.html', icon: icons.settings }
+      ];
+    } else {
+      return [
+        { label: 'Dashboard', href: 'dashboard.html', icon: icons.dashboard },
+        { label: 'Attack Surface', href: 'attack-map.html', icon: icons.attack },
+        { label: 'Threat Feed', href: 'dashboard.html#threats', icon: icons.threats },
+        { label: 'Endpoints', href: 'dashboard.html#endpoints', icon: icons.endpoints },
+        { label: 'Assets', href: 'dashboard.html#assets', icon: icons.assets },
+        { label: 'Forms', href: 'dashboard.html#forms', icon: icons.forms },
+        { label: 'Technologies', href: 'dashboard.html#tech', icon: icons.tech },
+        { label: 'Reports', href: 'reports.html', icon: icons.reports },
+        { label: 'AI Assistant', href: 'dashboard.html#ai', icon: icons.ai },
+        { label: 'History', href: 'history.html', icon: icons.history },
+        { label: 'Settings', href: 'settings.html', icon: icons.settings }
+      ];
+    }
   }
 
   _detectActivePage() {
@@ -199,6 +120,33 @@ class SQSidebar extends HTMLElement {
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
         this.collapsed = !this.collapsed;
+      });
+    }
+
+    // Mode Toggle Button
+    const modeBtn = this.shadowRoot.querySelector('.mode-toggle-btn');
+    if (modeBtn) {
+      modeBtn.addEventListener('click', () => {
+        const currentMode = localStorage.getItem('userMode') || 'simple';
+        const newMode = currentMode === 'simple' ? 'expert' : 'simple';
+        localStorage.setItem('userMode', newMode);
+        
+        // Broadcast change globally
+        document.body.classList.remove('mode-simple', 'mode-expert');
+        document.body.classList.add('mode-' + newMode);
+        
+        this.dispatchEvent(new CustomEvent('mode-change', {
+          detail: { mode: newMode },
+          bubbles: true,
+          composed: true
+        }));
+
+        this.render();
+        this._bindEvents();
+        this._detectActivePage();
+        
+        // Reload page to re-poll and apply AI prompt adjustments dynamically
+        window.location.reload();
       });
     }
 
@@ -442,6 +390,43 @@ class SQSidebar extends HTMLElement {
           opacity: 1;
         }
 
+        /* Mode Switcher Toggle */
+        .mode-toggle-container {
+          padding: 4px 0 12px 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          overflow: hidden;
+          transition: all 0.2s ease;
+        }
+        .mode-toggle-btn {
+          width: 100%;
+          background: #18181b;
+          border: 1px solid #27272a;
+          color: #f4f4f5;
+          padding: 8px 12px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 11px;
+          font-family: inherit;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          transition: all 0.2s ease;
+        }
+        .mode-toggle-btn:hover {
+          background: #27272a;
+          border-color: #3f3f46;
+        }
+        .sidebar.collapsed .mode-toggle-btn {
+          padding: 8px 0;
+          border: none;
+          background: transparent;
+        }
+        .sidebar.collapsed .mode-toggle-btn .mode-text {
+          display: none;
+        }
+
         /* Bottom section */
         .sidebar-bottom {
           border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -530,6 +515,14 @@ class SQSidebar extends HTMLElement {
 
         <!-- Bottom Section -->
         <div class="sidebar-bottom">
+          <!-- Adaptive Mode Toggle Switch -->
+          <div class="mode-toggle-container">
+            <button class="mode-toggle-btn" aria-label="Toggle user mode">
+              <span class="mode-indicator-dot" style="width: 8px; height: 8px; border-radius: 50%; background: ${localStorage.getItem('userMode') === 'expert' ? '#7c4dff' : '#00e5ff'}; display: inline-block;"></span>
+              <span class="mode-text">${localStorage.getItem('userMode') === 'expert' ? 'Expert Mode' : 'Simple Mode'}</span>
+            </button>
+          </div>
+          
           <button class="collapse-toggle" aria-label="Toggle sidebar">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"
                  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">

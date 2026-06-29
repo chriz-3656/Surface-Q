@@ -1969,3 +1969,14 @@ small {
     padding: 0 !important;
   }
 }
+
+/* ============================================================
+   Mode-Based Display Controls (Simple vs. Expert Mode)
+   ============================================================ */
+body.mode-simple .expert-only {
+  display: none !important;
+}
+
+body.mode-expert .simple-only {
+  display: none !important;
+}

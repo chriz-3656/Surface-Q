@@ -165,6 +165,57 @@
     <!-- Content Wrapper -->
     <div class="p-6 space-y-6">
 
+      <!-- Simple Mode View Grid -->
+      <div class="simple-only space-y-6">
+        <!-- Hero Trust Card -->
+        <div class="glass-card flex flex-col md:flex-row items-center gap-6 p-8">
+          <sq-risk-score score="100" size="200" id="simple-score-gauge"></sq-risk-score>
+          <div class="space-y-4 flex-grow">
+            <div class="flex items-center gap-3">
+              <span id="simple-status-badge" class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-950/60 text-emerald-400 border border-emerald-800/30">
+                🟢 Safe
+              </span>
+              <h2 id="simple-target-domain" class="text-2xl font-bold text-white tracking-tight">domain.com</h2>
+            </div>
+            <p id="simple-exec-summary" class="text-base text-gray-300 leading-relaxed font-normal">
+              This website is safe to browse. All standard protections are active.
+            </p>
+            <div class="flex items-center gap-4 pt-2">
+              <a href="#ai" class="px-5 py-2.5 rounded-xl bg-gradient-to-br from-sq-cyan to-sq-purple text-xs font-bold text-white tracking-wide hover:opacity-95 transition-opacity duration-200">
+                Explain Details
+              </a>
+              <button onclick="window.location.reload()" class="px-5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] text-xs font-bold text-gray-300 transition-all duration-200">
+                Refresh Check
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plain English Safety Tips & Advice -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="glass-card space-y-4">
+            <h3 class="section-title text-sq-cyan">What happened?</h3>
+            <p id="simple-explanation" class="text-sm text-gray-300 leading-relaxed font-normal">
+              We completed a passive check of this site's security configuration. It uses encrypted connections to guard your data.
+            </p>
+          </div>
+          <div class="glass-card space-y-4">
+            <h3 class="section-title text-sq-purple">Safety Tips</h3>
+            <ul id="simple-tips" class="space-y-3">
+              <li class="flex items-start gap-2 text-sm text-gray-300 font-normal">
+                <span class="text-emerald-400">✓</span> Connection is encrypted securely
+              </li>
+              <li class="flex items-start gap-2 text-sm text-gray-300 font-normal">
+                <span class="text-emerald-400">✓</span> Basic website configuration verified
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expert Mode View Grid -->
+      <div class="expert-only space-y-6">
+
       <!-- ══════════════════════════════════════════════════════════════
            ROW 1 — Stat Cards
            ══════════════════════════════════════════════════════════════ -->
@@ -326,6 +377,7 @@
           ></sq-finding>
         </div>
       </section>
+      </div> <!-- Close expert-only -->
 
       <!-- ══════════════════════════════════════════════════════════════
            ROW 5 — AI Security Assistant
@@ -440,6 +492,10 @@
        ════════════════════════════════════════════════════════════════════ -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Set Mode classes
+      const activeMode = localStorage.getItem('userMode') || 'simple';
+      document.body.classList.remove('mode-simple', 'mode-expert');
+      document.body.classList.add('mode-' + activeMode);
 
       // ── Shared Chart Defaults ──
       Chart.defaults.color = 'rgba(255, 255, 255, 0.45)';
@@ -862,6 +918,63 @@
           scoreGauge.setAttribute('score', score.toString());
         }
 
+        // Update Simple Mode specific items
+        const simpleGauge = document.getElementById('simple-score-gauge');
+        if (simpleGauge) {
+          simpleGauge.setAttribute('score', score.toString());
+        }
+
+        const simpleDomain = document.getElementById('simple-target-domain');
+        if (simpleDomain) {
+          simpleDomain.textContent = scan.domain || 'Dashboard';
+        }
+
+        const simpleExec = document.getElementById('simple-exec-summary');
+        const simpleExplain = document.getElementById('simple-explanation');
+        const simpleBadge = document.getElementById('simple-status-badge');
+        const simpleTips = document.getElementById('simple-tips');
+
+        if (scan.aiAssessment) {
+          const simpleData = scan.aiAssessment.simple;
+          if (simpleData) {
+            if (simpleExec) simpleExec.innerHTML = simpleData.executiveSummary;
+            if (simpleExplain) simpleExplain.innerHTML = simpleData.riskExplanation;
+            if (simpleBadge) {
+              simpleBadge.textContent = simpleData.ratingText || (score > 75 ? '🟢 Safe' : (score > 40 ? '🟡 Warning' : '🔴 Dangerous'));
+              const bText = simpleBadge.textContent;
+              if (bText.includes('Safe')) {
+                simpleBadge.className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-950/60 text-emerald-400 border border-emerald-800/30";
+              } else if (bText.includes('Warning')) {
+                simpleBadge.className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-950/60 text-amber-400 border border-amber-800/30";
+              } else {
+                simpleBadge.className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-red-950/60 text-red-400 border border-red-800/30";
+              }
+            }
+            if (simpleTips && simpleData.safetyTips) {
+              simpleTips.innerHTML = simpleData.safetyTips.map(tip => `
+                <li class="flex items-start gap-2 text-sm text-gray-300 font-normal">
+                  <span class="text-emerald-400">✓</span> ${tip}
+                </li>
+              `).join('');
+            }
+          }
+        } else {
+          const fallbackBadgeText = score > 75 ? '🟢 Safe' : (score > 40 ? '🟡 Warning' : '🔴 Dangerous');
+          if (simpleBadge) simpleBadge.textContent = fallbackBadgeText;
+          if (simpleExec) simpleExec.textContent = `Passive check completed. Website has a safety rating of ${score}/100.`;
+          if (simpleExplain) simpleExplain.textContent = `Passive scan detected ${missingHeaders.length} missing security headers. Encryption is active.`;
+          if (simpleTips) {
+            simpleTips.innerHTML = `
+              <li class="flex items-start gap-2 text-sm text-gray-300 font-normal">
+                <span class="${score > 70 ? 'text-emerald-400' : 'text-amber-400'}">✓</span> Connection is HTTPS secure: ${scan.isHttps ? 'Yes' : 'No'}
+              </li>
+              <li class="flex items-start gap-2 text-sm text-gray-300 font-normal">
+                <span class="${missingHeaders.length === 0 ? 'text-emerald-400' : 'text-amber-400'}">✓</span> Missing security configs: ${missingHeaders.length}
+              </li>
+            `;
+          }
+        }
+
         // Update Stat Cards values
         const statCards = document.querySelectorAll('sq-stat-card');
         if (statCards.length >= 4) {
@@ -945,17 +1058,31 @@
         // Update AI message fallback greeting
         const aiResponse = document.querySelector('#chat-container .chat-bubble-ai:last-of-type p');
         if (aiResponse) {
+          const userMode = localStorage.getItem('userMode') || 'simple';
           if (scan.aiAssessment) {
-            let advice = `🧠 <strong>SurfaceQ AI Assisted Threat Report</strong> for <strong class="text-white">${scan.domain}</strong>:<br><br>`;
-            advice += `<strong>Overview:</strong> ${scan.aiAssessment.executiveSummary}<br><br>`;
-            advice += `<strong>Risk Profile:</strong> ${scan.aiAssessment.riskExplanation}<br><br>`;
-            if (scan.aiAssessment.recommendations && scan.aiAssessment.recommendations.length > 0) {
-              advice += `<strong>Remediation Tasks:</strong><br>`;
-              scan.aiAssessment.recommendations.forEach(rec => {
-                advice += `• ${rec}<br>`;
-              });
+            if (userMode === 'simple') {
+              let advice = `🧠 <strong>SurfaceQ AI Assisted Safety Assistant:</strong><br><br>`;
+              advice += `<strong>Summary:</strong> ${scan.aiAssessment.simple.executiveSummary}<br><br>`;
+              advice += `<strong>What to know:</strong> ${scan.aiAssessment.simple.riskExplanation}<br><br>`;
+              if (scan.aiAssessment.simple.safetyTips && scan.aiAssessment.simple.safetyTips.length > 0) {
+                advice += `<strong>Safety Tips:</strong><br>`;
+                scan.aiAssessment.simple.safetyTips.forEach(tip => {
+                  advice += `• ${tip}<br>`;
+                });
+              }
+              aiResponse.innerHTML = advice;
+            } else {
+              let advice = `🧠 <strong>SurfaceQ AI Assisted Threat Report</strong> for <strong class="text-white">${scan.domain}</strong>:<br><br>`;
+              advice += `<strong>Overview:</strong> ${scan.aiAssessment.expert.executiveSummary}<br><br>`;
+              advice += `<strong>Risk Profile:</strong> ${scan.aiAssessment.expert.riskExplanation}<br><br>`;
+              if (scan.aiAssessment.expert.recommendations && scan.aiAssessment.expert.recommendations.length > 0) {
+                advice += `<strong>Remediation Tasks:</strong><br>`;
+                scan.aiAssessment.expert.recommendations.forEach(rec => {
+                  advice += `• ${rec}<br>`;
+                });
+              }
+              aiResponse.innerHTML = advice;
             }
-            aiResponse.innerHTML = advice;
           } else {
             let advice = `I've analyzed the scan for <strong class="text-white">${scan.domain}</strong>.<br><br>`;
             if (missingHeaders.length > 0) {

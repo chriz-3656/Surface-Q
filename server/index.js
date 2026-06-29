@@ -36,24 +36,35 @@ let latestScan = null;
 
 // Server-side AI Hardening Assessment with Fallbacks
 async function generateAIAssessment(scan) {
-  const prompt = `Perform a professional cybersecurity attack surface assessment on the following scanned website details:
+  const prompt = `Perform a dual-mode cybersecurity assessment on the following scanned website details:
   Domain: ${scan.domain}
   URL: ${scan.url}
   Security Headers: ${JSON.stringify(scan.securityHeaders || [])}
   Mixed Content: ${JSON.stringify(scan.mixedContent || [])}
   Technologies: ${JSON.stringify(scan.technologies || [])}
-  Scripts Count: ${scan.scripts?.length || 0}
   
-  You MUST return your response as a valid, parsable JSON object (do not include markdown block formatting, just the raw JSON object string) with the exact keys:
+  You MUST return your response as a valid, parsable JSON object (do not include markdown block formatting, just the raw JSON object string) with this exact structure:
   {
-    "score": <number between 0 and 100 representing overall security posture>,
-    "executiveSummary": "<short 2-sentence executive summary of posture>",
-    "riskExplanation": "<concise paragraph explanation of the most critical vulnerabilities/risks>",
-    "recommendations": [
-      "<concrete recommendation 1>",
-      "<concrete recommendation 2>",
-      "<concrete recommendation 3>"
-    ]
+    "score": <overall security score 0-100>,
+    "simple": {
+      "ratingText": "<🟢 Safe, 🟡 Warning, or 🔴 Dangerous based on posture>",
+      "executiveSummary": "<short friendly 2-sentence summary in plain English for everyday users>",
+      "riskExplanation": "<explain in plain English for a non-technical user what happened and why should they care. Avoid security jargon like CSP, HSTS, XSS, headers.>",
+      "safetyTips": [
+        "<simple safety tip 1>",
+        "<simple safety tip 2>",
+        "<simple safety tip 3>"
+      ]
+    },
+    "expert": {
+      "executiveSummary": "<technical executive summary for security researchers>",
+      "riskExplanation": "<detailed analysis mapping vulnerabilities to OWASP and CWE, explaining threat vectors>",
+      "recommendations": [
+        "<concrete remediation step 1>",
+        "<concrete remediation step 2>",
+        "<concrete remediation step 3>"
+      ]
+    }
   }`;
 
   // 1. Attempt Google Gemini AI analysis
@@ -114,15 +125,32 @@ async function generateAIAssessment(scan) {
   console.log('⚠️ No AI API keys active. Running rule-based risk evaluation.');
   const missingCount = (scan.securityHeaders || []).filter(h => h.status !== 'present').length;
   const computedScore = Math.max(10, 100 - (missingCount * 18));
+  
+  let rating = "🟢 Safe";
+  if (missingCount > 3) rating = "🔴 Dangerous";
+  else if (missingCount > 0) rating = "🟡 Warning";
+
   return {
     score: computedScore,
-    executiveSummary: `Passive scan of ${scan.domain} complete. Overall security controls are evaluated locally.`,
-    riskExplanation: `Passive scanning detected ${missingCount} missing security headers. This exposes the domain to framing, MIME-sniffing, and cross-site scripting (XSS) risks.`,
-    recommendations: [
-      "Hardening: Deploy standard security headers (CSP, HSTS).",
-      "Asset Monitoring: Review active external script calls.",
-      "SSL/TLS: Ensure all resources load securely over HTTPS."
-    ]
+    simple: {
+      ratingText: rating,
+      executiveSummary: `Website check complete. Most standard browser protections are active.`,
+      riskExplanation: `We detected ${missingCount} missing safety settings on this domain. This might allow third-party scripts to act unexpectedly.`,
+      safetyTips: [
+        "Connection is secure (HTTPS is active).",
+        "Avoid entering highly sensitive passwords on unverified sites.",
+        "Check back if security warning alerts change."
+      ]
+    },
+    expert: {
+      executiveSummary: `Passive scan of ${scan.domain} complete. Overall security controls are evaluated locally.`,
+      riskExplanation: `Passive scanning detected ${missingCount} missing security headers. This exposes the domain to framing, MIME-sniffing, and cross-site scripting (XSS) risks.`,
+      recommendations: [
+        "Hardening: Deploy standard security headers (CSP, HSTS).",
+        "Asset Monitoring: Review active external script calls.",
+        "SSL/TLS: Ensure all resources load securely over HTTPS."
+      ]
+    }
   };
 }
 
