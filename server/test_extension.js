@@ -30,10 +30,10 @@ const path = require('path');
     const extensionId = worker.url().split('/')[2];
     console.log(`✅ Found Extension ID: ${extensionId}`);
 
-    // 2. Open target website (example.com) to trigger passive header intercept
+    // 2. Open target website (chriz-3656.github.io) to trigger passive header intercept
     const sitePage = await browserContext.newPage();
-    console.log('1. Navigating to test target: https://example.com...');
-    await sitePage.goto('https://example.com', { waitUntil: 'networkidle' });
+    console.log('1. Navigating to test target: https://chriz-3656.github.io/...');
+    await sitePage.goto('https://chriz-3656.github.io/', { waitUntil: 'networkidle' });
 
     // 3. Open Extension Popup window
     console.log('2. Opening Extension Popup page...');
@@ -50,7 +50,7 @@ const path = require('path');
     const resultText = await popupPage.locator('#result-box').innerText();
     console.log('RESULT TEXT RECEIVED IN POPUP:', resultText);
     
-    if (resultText.includes('example.com')) {
+    if (resultText.includes('chriz-3656.github.io')) {
       console.log('✅ Success: Extension generated structured scan JSON!');
     } else {
       throw new Error('Scan result did not contain target domain');
@@ -64,17 +64,17 @@ const path = require('path');
     // Give it a second to fetch and sync from the backend cache
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Verify Title/Domain is updated to example.com
+    // Verify Title/Domain is updated to chriz-3656.github.io
     const dashboardTitle = await dashboardPage.evaluate(() => {
       const header = document.querySelector('sq-header');
       return header ? header.getAttribute('title') : '';
     });
 
     console.log(`Dashboard Title: ${dashboardTitle}`);
-    if (dashboardTitle.toLowerCase() === 'example.com') {
+    if (dashboardTitle.toLowerCase() === 'chriz-3656.github.io') {
       console.log('✅ Success: Extension and Dashboard communicating correctly via Server!');
     } else {
-      throw new Error(`Integration failed: Dashboard title is "${dashboardTitle}", expected "example.com"`);
+      throw new Error(`Integration failed: Dashboard title is "${dashboardTitle}", expected "chriz-3656.github.io"`);
     }
 
     console.log('==================================================');
