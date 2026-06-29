@@ -120,6 +120,16 @@ If you don't have Node.js or Docker installed globally:
    ```
 3. This boots up a lightweight local listener on port `3000` without Node runtime dependencies.
 
+### 🖥️ How to Use
+
+1. **Open the Dashboard**: Navigate to `http://localhost:3000/dashboard.html` in your browser.
+2. **Navigate to Target Website**: Go to any page you want to analyze (e.g., `https://github.com`) in the Chrome window where the extension is active.
+3. **Trigger Scan**:
+   - Click the **SurfaceQ shield** icon in the toolbar.
+   - Click **Scan Website**.
+   - The extension will analyze HTTP response headers, tech signatures, and security controls, displaying results inside the popup window.
+4. **View Live Updates**: Your active dashboard at `http://localhost:3000/dashboard.html` will instantly sync with the scan payload, updating the risk score, vulnerabilities ledger, asset statistics, and the AI chatbot guidelines!
+
 ---
 
 ## 🧪 Automated Testing
