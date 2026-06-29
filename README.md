@@ -3,7 +3,7 @@
 
 Surface-Q is an open-source, passive security scanning tool consisting of a Chrome Extension and an AI-powered Dashboard. It analyzes your web attack surface in real-time without sending malicious payloads, ensuring zero disruption to the target servers.
 
-![Surface-Q Overview](assets/hero-final_000/hero-final_000.webp)
+![Surface-Q Overview](assets/1.png)
 
 ## 📌 Problem Statement
 Traditional DAST (Dynamic Application Security Testing) tools are aggressive, noisy, and frequently cause disruptions (e.g., submitting form data, triggering rate limits, polluting databases). Developers and bug bounty hunters need a way to understand the technology stack, security headers, form configurations, and potential risks of a website *passively*, before engaging in active testing.
