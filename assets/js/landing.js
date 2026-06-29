@@ -10,18 +10,6 @@ function initAll() {
   // Initialize Hero Frame Scrubbing
   initHeroFrameScrub();
 
-  // Initialize Canvas Visualizer
-  const canvas = document.getElementById('cinematic-canvas');
-  if (canvas) {
-    initVisualizer(canvas);
-  }
-
-  // Initialize CTA Particles
-  const ctaCanvas = document.getElementById('cta-particle-canvas');
-  if (ctaCanvas) {
-    initCtaParticles(ctaCanvas);
-  }
-
   // --- Features Section Animations ---
   gsap.fromTo("#features .feature-card",
     { opacity: 0, y: 30 },
@@ -231,9 +219,6 @@ function initHeroFrameScrub() {
     }
   }
 
-  console.log("Hero initialized");
-  console.log("Loading", getFramePath(0));
-
   // 1. Load frame 0 immediately to show first image
   const firstFrame = new Image();
   firstFrame.src = getFramePath(0);
@@ -251,19 +236,42 @@ function initHeroFrameScrub() {
     console.error("Frame failed:", getFramePath(0));
   };
 
-  // Preloads remaining frames in parallel
+  // Preloads remaining frames sequentially in small batches to prevent network stalling
   function preloadRestOfFrames() {
-    for (let i = 1; i < TOTAL_FRAMES; i++) {
-      const path = getFramePath(i);
-      const img = new Image();
-      img.src = path;
-      img.onload = () => {
-        frames[i] = img;
-      };
-      img.onerror = () => {
-        console.error("Frame failed:", path);
-      };
+    let currentIndex = 1;
+    const batchSize = 5;
+
+    function loadNextBatch() {
+      if (currentIndex >= TOTAL_FRAMES) return;
+
+      const promises = [];
+      const end = Math.min(currentIndex + batchSize, TOTAL_FRAMES);
+      
+      for (let i = currentIndex; i < end; i++) {
+        promises.push(new Promise((resolve) => {
+          const path = getFramePath(i);
+          const img = new Image();
+          img.src = path;
+          img.onload = () => {
+            frames[i] = img;
+            resolve();
+          };
+          img.onerror = () => {
+            console.error("Frame failed:", path);
+            resolve(); // Resolve anyway to continue batching
+          };
+        }));
+      }
+
+      currentIndex += batchSize;
+      
+      // When this batch finishes, queue the next batch on the event loop
+      Promise.all(promises).then(() => {
+        setTimeout(loadNextBatch, 20); // Small yield to prevent thread locking
+      });
     }
+
+    loadNextBatch();
   }
 
   function initScrollTrigger() {
@@ -303,133 +311,5 @@ function initHeroFrameScrub() {
   }
 }
 
-/**
- * High-Performance Generative Canvas Engine (Section 4 Map Visualizer)
- */
-function initVisualizer(canvas) {
-  const ctx = canvas.getContext('2d');
-  let width = canvas.width = window.innerWidth;
-  let height = canvas.height = window.innerHeight;
-
-  window.addEventListener('resize', () => {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-  });
-
-  const state = { progress: 0 };
-
-  // GSAP ScrollTrigger updates network highlight progress
-  gsap.to(state, {
-    progress: 1,
-    ease: "none",
-    scrollTrigger: {
-      trigger: "#section-intelligence",
-      start: "top bottom",
-      end: "bottom top",
-      scrub: true
-    }
-  });
-
-  const PARTICLE_COUNT = 80;
-  const particles = [];
-
-  for (let i = 0; i < PARTICLE_COUNT; i++) {
-    particles.push({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      radius: Math.random() * 2 + 1
-    });
   }
-
-  function render() {
-    ctx.clearRect(0, 0, width, height);
-
-    const cp = state.progress;
-
-    // Draw connecting lines with alpha based on distance and scroll progress
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const p1 = particles[i];
-      p1.x += p1.vx;
-      p1.y += p1.vy;
-
-      if (p1.x < 0 || p1.x > width) p1.vx *= -1;
-      if (p1.y < 0 || p1.y > height) p1.vy *= -1;
-
-      ctx.fillStyle = `rgba(0, 240, 255, ${0.3 + cp * 0.5})`;
-      ctx.beginPath();
-      ctx.arc(p1.x, p1.y, p1.radius, 0, Math.PI * 2);
-      ctx.fill();
-
-      for (let j = i + 1; j < PARTICLE_COUNT; j++) {
-        const p2 = particles[j];
-        const dx = p1.x - p2.x;
-        const dy = p1.y - p2.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < 120) {
-          const alpha = (1 - dist / 120) * (0.12 + cp * 0.48);
-          ctx.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.stroke();
-        }
-      }
-    }
-
-    requestAnimationFrame(render);
-  }
-
-  requestAnimationFrame(render);
-}
-
-/**
- * Section 7: Background Ambient Particles Engine
- */
-function initCtaParticles(canvas) {
-  const ctx = canvas.getContext('2d');
-  let width = canvas.width = window.innerWidth;
-  let height = canvas.height = window.innerHeight;
-
-  window.addEventListener('resize', () => {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-  });
-
-  const PARTICLE_COUNT = 40;
-  const particles = [];
-
-  for (let i = 0; i < PARTICLE_COUNT; i++) {
-    particles.push({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.2,
-      vy: (Math.random() - 0.5) * 0.2,
-      radius: Math.random() * 1.2 + 0.6
-    });
-  }
-
-  function render() {
-    ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
-    
-    particles.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-
-      if (p.x < 0 || p.x > width) p.vx *= -1;
-      if (p.y < 0 || p.y > height) p.vy *= -1;
-
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    requestAnimationFrame(render);
-  }
-
-  requestAnimationFrame(render);
 }
