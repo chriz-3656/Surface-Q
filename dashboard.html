@@ -336,7 +336,36 @@
       </section>
 
       <!-- ══════════════════════════════════════════════════════════════
-           ROW 4 — Recent Findings
+           ROW 4 — Collected Telemetry
+           ══════════════════════════════════════════════════════════════ -->
+      <section id="telemetry-row" class="grid grid-cols-1 lg:grid-cols-3 gap-6 fade-in-up fade-in-up-3 mb-6">
+        
+        <!-- Technologies -->
+        <div class="glass-card flex flex-col h-full">
+          <h3 class="section-title mb-4">Detected Tech Stack</h3>
+          <div id="tech-stack-container" class="flex flex-wrap gap-2">
+            <span class="text-sm text-gray-500">Waiting for scan data...</span>
+          </div>
+        </div>
+
+        <!-- Forms & Inputs -->
+        <div class="glass-card flex flex-col h-full">
+          <h3 class="section-title mb-4">Forms & Inputs</h3>
+          <div id="forms-container" class="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+            <span class="text-sm text-gray-500">Waiting for scan data...</span>
+          </div>
+        </div>
+
+        <!-- Raw Headers -->
+        <div class="glass-card flex flex-col h-full">
+          <h3 class="section-title mb-4">Raw HTTP Headers</h3>
+          <pre id="raw-headers-container" class="text-xs font-mono text-gray-400 bg-black/40 p-3 rounded border border-white/5 max-h-[200px] overflow-y-auto custom-scrollbar whitespace-pre-wrap word-break">Waiting for scan data...</pre>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           ROW 5 — Recent Findings
            ══════════════════════════════════════════════════════════════ -->
       <section id="recent-findings" class="fade-in-up fade-in-up-3">
         <div class="flex items-center justify-between mb-4">
@@ -1046,6 +1075,39 @@
             headerScore, scan.isHttps ? 95 : 0, cspScore, 70, 80, 85
           ];
           window.securityCategoriesChartInstance.update();
+        }
+
+        // Populate Technologies
+        const techContainer = document.getElementById('tech-stack-container');
+        if (techContainer) {
+          if (scan.technologies && scan.technologies.length > 0) {
+            techContainer.innerHTML = scan.technologies.map(tech => `<span class="px-2.5 py-1 rounded bg-white/5 border border-white/10 text-xs font-medium text-gray-300">${tech}</span>`).join('');
+          } else {
+            techContainer.innerHTML = '<span class="text-sm text-gray-500">No specific framework signatures detected.</span>';
+          }
+        }
+
+        // Populate Forms
+        const formsContainer = document.getElementById('forms-container');
+        if (formsContainer) {
+          if (scan.forms && scan.forms.length > 0) {
+            formsContainer.innerHTML = scan.forms.map(f => `
+              <div class="p-2 rounded bg-white/5 border border-white/10">
+                <div class="text-xs font-semibold text-sq-cyan mb-1">Action: ${f.action || 'Self'}</div>
+                <div class="text-xs text-gray-400">Inputs: ${f.inputs ? f.inputs.map(i => i.type || 'text').join(', ') : 'None'}</div>
+              </div>
+            `).join('');
+          } else {
+            formsContainer.innerHTML = '<span class="text-sm text-gray-500">No forms detected on the page.</span>';
+          }
+        }
+
+        // Populate Raw Headers
+        const headersContainer = document.getElementById('raw-headers-container');
+        if (headersContainer && scan.rawHeaders) {
+          headersContainer.textContent = Object.entries(scan.rawHeaders)
+            .map(([k, v]) => `${k}: ${v}`)
+            .join('\n');
         }
 
         // Update AI message fallback greeting
