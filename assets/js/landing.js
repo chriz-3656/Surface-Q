@@ -310,6 +310,3 @@ function initHeroFrameScrub() {
     requestAnimationFrame(renderLoop);
   }
 }
-
-  }
-}
