@@ -68,7 +68,13 @@ function initAll() {
       scrollTrigger: {
         trigger: "#privacy",
         start: "top 90%",
-        toggleActions: "play none none none"
+        toggleActions: "play none none none",
+        onEnter: () => {
+          // Stagger reveal the checklist items by adding 'active' class
+          document.querySelectorAll('#privacy .checklist-item').forEach((item, index) => {
+            setTimeout(() => item.classList.add('active'), 400 + (index * 100));
+          });
+        }
       }
     }
   );
