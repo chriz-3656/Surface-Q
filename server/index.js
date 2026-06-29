@@ -31,8 +31,9 @@ app.get('/dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../dashboard.html'));
 });
 
-// In-memory cache for latest scan data
+// In-memory cache for latest scan data and live status
 let latestScan = null;
+let currentScanStatus = { status: 'Idle', timestamps: null };
 
 // Server-side AI Hardening Assessment with Fallbacks
 async function generateAIAssessment(scan) {
@@ -198,14 +199,36 @@ async function generateAIAssessment(scan) {
 
 app.post('/api/scans', async (req, res) => {
   const scanData = req.body;
+  
+  // Track Live Timestamps and Status
+  currentScanStatus = {
+    status: 'AI Processing',
+    timestamps: {
+      scanStarted: Date.now() - 500, // Estimate extension collection time
+      backendReceived: Date.now(),
+      aiStarted: Date.now()
+    }
+  };
+
   try {
     const aiResult = await generateAIAssessment(scanData);
+    
+    currentScanStatus.timestamps.aiFinished = Date.now();
+    currentScanStatus.status = 'Analysis Complete';
+    
     scanData.aiAssessment = aiResult;
+    scanData.timestamps = currentScanStatus.timestamps;
+    
     latestScan = scanData;
     res.json({ status: 'success', message: 'Scan data cached and AI assessment completed' });
   } catch (err) {
     console.error('Error during AI assessment generation:', err);
+    currentScanStatus.timestamps.aiFinished = Date.now();
+    currentScanStatus.status = 'Analysis Complete (Error)';
+    
     scanData.aiAssessment = null;
+    scanData.timestamps = currentScanStatus.timestamps;
+    
     latestScan = scanData;
     res.json({ status: 'success', message: 'Scan data cached without AI assessment' });
   }
@@ -216,6 +239,10 @@ app.get('/api/scans/latest', (req, res) => {
     return res.status(404).json({ error: 'No scan data available' });
   }
   res.json(latestScan);
+});
+
+app.get('/api/scans/status', (req, res) => {
+  res.json(currentScanStatus);
 });
 
 // Basic API check endpoint

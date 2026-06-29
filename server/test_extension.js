@@ -63,7 +63,7 @@ const path = require('path');
     // 6. Verify Dashboard receives and renders this payload
     console.log('4. Navigating to local Dashboard...');
     const dashboardPage = await browserContext.newPage();
-    await dashboardPage.goto('http://localhost:3000/dashboard.html', { waitUntil: 'networkidle' });
+    await dashboardPage.goto('http://localhost:3000/dashboard.html', { waitUntil: 'domcontentloaded' });
 
     // Give it a second to fetch and sync from the backend cache
     await new Promise(resolve => setTimeout(resolve, 2000));
