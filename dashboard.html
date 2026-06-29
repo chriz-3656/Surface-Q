@@ -26,11 +26,11 @@
       theme: {
         extend: {
           colors: {
-            'sq-bg': '#050816',
-            'sq-surface': '#0a0e1a',
-            'sq-border': 'rgba(255,255,255,0.06)',
-            'sq-cyan': '#00e5ff',
-            'sq-purple': '#7c4dff',
+            'sq-bg': '#09090b',
+            'sq-surface': '#0f0f11',
+            'sq-border': '#27272a',
+            'sq-accent': '#ffffff',
+            'sq-muted': '#71717a',
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
@@ -69,7 +69,7 @@
 
     /* ── Risk Breakdown Bar ── */
     .risk-bar-track {
-      background: rgba(255, 255, 255, 0.06);
+      background: #27272a;
       border-radius: 999px;
       height: 6px;
       overflow: hidden;
@@ -82,33 +82,30 @@
 
     /* ── Chat Bubbles ── */
     .chat-bubble-ai {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 0 1rem 1rem 1rem;
+      background: #0f0f11;
+      border: 1px solid #27272a;
+      border-radius: 0 8px 8px 8px;
       max-width: 85%;
     }
     .chat-bubble-user {
-      background: rgba(0, 229, 255, 0.08);
-      border: 1px solid rgba(0, 229, 255, 0.15);
-      border-radius: 1rem 0 1rem 1rem;
+      background: #18181b;
+      border: 1px solid #3f3f46;
+      border-radius: 8px 0 8px 8px;
       max-width: 85%;
     }
 
     /* ── Section Title ── */
     .section-title {
-      font-size: 1.125rem;
+      font-size: 1rem;
       font-weight: 600;
-      color: #fff;
+      color: #ffffff;
       letter-spacing: -0.01em;
     }
 
-    /* ── Pulse Glow ── */
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.15); }
-      50% { box-shadow: 0 0 20px 4px rgba(0, 229, 255, 0.08); }
-    }
+    /* ── Clean flat state containers (No neon glows) ── */
     .pulse-glow {
-      animation: pulseGlow 3s ease-in-out infinite;
+      border: 1px solid #27272a;
+      background: #0f0f11;
     }
 
     /* ── Fade-in animation ── */

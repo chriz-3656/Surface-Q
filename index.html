@@ -16,11 +16,11 @@
       theme: {
         extend: {
           colors: {
-            'sq-bg': '#050816',
-            'sq-surface': '#0a0e1a',
-            'sq-border': 'rgba(255,255,255,0.06)',
-            'sq-cyan': '#00e5ff',
-            'sq-purple': '#7c4dff',
+            'sq-bg': '#09090b',
+            'sq-surface': '#0f0f11',
+            'sq-border': '#27272a',
+            'sq-accent': '#ffffff',
+            'sq-muted': '#71717a',
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -32,114 +32,74 @@
   <style>
     html { scroll-behavior: smooth; }
 
-    /* Animated gradient mesh background */
-    @keyframes meshMove {
-      0%, 100% {
-        background-position: 0% 0%, 100% 100%, 50% 50%, 80% 20%;
-      }
-      25% {
-        background-position: 30% 70%, 70% 30%, 20% 80%, 50% 60%;
-      }
-      50% {
-        background-position: 70% 30%, 30% 70%, 80% 20%, 20% 80%;
-      }
-      75% {
-        background-position: 50% 50%, 0% 100%, 60% 40%, 30% 50%;
-      }
-    }
-
-    .gradient-mesh {
+    /* Minimalist layout grids */
+    .grid-pattern {
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background:
-        radial-gradient(ellipse 600px 600px at 20% 20%, rgba(0, 229, 255, 0.15), transparent),
-        radial-gradient(ellipse 500px 500px at 80% 80%, rgba(124, 77, 255, 0.2), transparent),
-        radial-gradient(ellipse 700px 700px at 50% 50%, rgba(10, 30, 80, 0.3), transparent),
-        radial-gradient(ellipse 400px 400px at 70% 20%, rgba(0, 229, 255, 0.1), transparent);
-      background-size: 200% 200%, 200% 200%, 200% 200%, 200% 200%;
-      animation: meshMove 20s ease-in-out infinite;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+      background-size: 24px 24px;
     }
 
-    /* Gradient text utility */
-    .gradient-text {
-      background: linear-gradient(135deg, #00e5ff, #7c4dff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    /* Subtle top linear highlight */
+    .top-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      z-index: 10;
     }
 
-    /* Glow effects */
-    .glow-cyan {
-      box-shadow: 0 0 20px rgba(0, 229, 255, 0.15), 0 0 40px rgba(0, 229, 255, 0.05);
+    /* Premium typography and text styles */
+    .editorial-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: #ffffff;
     }
 
-    .glow-badge {
-      box-shadow: 0 0 15px rgba(0, 229, 255, 0.1), inset 0 0 15px rgba(0, 229, 255, 0.05);
+    /* Subdued cards instead of glowing boundaries */
+    .feature-card {
+      border: 1px solid #27272a;
+      background: #0f0f11;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
     }
-
-    /* Terminal animation */
-    @keyframes terminalType {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .terminal-line {
-      opacity: 0;
-      animation: terminalType 0.3s ease forwards;
-    }
-    .terminal-line:nth-child(1) { animation-delay: 0.3s; }
-    .terminal-line:nth-child(2) { animation-delay: 0.8s; }
-    .terminal-line:nth-child(3) { animation-delay: 1.3s; }
-    .terminal-line:nth-child(4) { animation-delay: 1.8s; }
-    .terminal-line:nth-child(5) { animation-delay: 2.3s; }
-    .terminal-line:nth-child(6) { animation-delay: 2.8s; }
-    .terminal-line:nth-child(7) { animation-delay: 3.3s; }
-
-    /* Dashed connector line for steps */
-    .step-connector {
-      border-top: 2px dashed rgba(255, 255, 255, 0.1);
-    }
-
-    /* Nav glassmorphism */
-    .nav-glass {
-      background: rgba(5, 8, 22, 0.7);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    /* Card hover glow */
     .feature-card:hover {
-      border-color: rgba(0, 229, 255, 0.15);
-      box-shadow: 0 8px 32px rgba(0, 229, 255, 0.06);
+      border-color: #3f3f46;
+      background: #18181b;
     }
 
-    /* Button gradient */
-    .btn-gradient {
-      background: linear-gradient(135deg, #00e5ff, #7c4dff);
-      transition: all 0.3s ease;
+    /* Editorial UI elements */
+    .btn-premium {
+      background: #ffffff;
+      color: #09090b;
+      transition: background-color 0.2s ease, transform 0.1s ease;
     }
-    .btn-gradient:hover {
-      box-shadow: 0 0 30px rgba(0, 229, 255, 0.3), 0 0 60px rgba(124, 77, 255, 0.15);
-      transform: translateY(-1px);
+    .btn-premium:hover {
+      background: #e4e4e7;
     }
 
-    /* Ghost button */
-    .btn-ghost {
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      transition: all 0.3s ease;
+    .btn-secondary-premium {
+      border: 1px solid #27272a;
+      background: transparent;
+      color: #ffffff;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
     }
-    .btn-ghost:hover {
-      border-color: rgba(0, 229, 255, 0.4);
-      background: rgba(0, 229, 255, 0.05);
+    .btn-secondary-premium:hover {
+      border-color: #3f3f46;
+      background: #0f0f11;
     }
   </style>
 </head>
 <body class="bg-sq-bg text-white font-sans antialiased">
 
-  <!-- Animated Gradient Mesh Background -->
-  <div class="gradient-mesh"></div>
+  <!-- Grid Pattern & Top Glow -->
+  <div class="grid-pattern"></div>
+  <div class="top-glow"></div>
 
   <!-- Navigation -->
   <nav class="fixed top-0 left-0 right-0 z-50 nav-glass">
