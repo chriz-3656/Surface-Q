@@ -201,6 +201,9 @@
               <button onclick="window.location.reload()" class="px-5 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] text-xs font-bold text-gray-300 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20" aria-label="Refresh Dashboard">
                 Refresh Check
               </button>
+              <button id="simple-export-pdf-btn" class="px-5 py-2.5 rounded-xl border border-sq-cyan/30 text-sq-cyan text-xs font-bold hover:bg-sq-cyan/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sq-cyan hidden">
+                Export PDF Report
+              </button>
             </div>
           </div>
         </div>
@@ -239,8 +242,13 @@
             <span id="scan-status-dot" class="w-3 h-3 rounded-full bg-amber-400 animate-pulse"></span>
             <span id="scan-status-text" class="text-sm font-bold text-white uppercase tracking-wider">Idle</span>
           </div>
-          <div id="scan-timeline-feed" class="flex flex-col items-end gap-1 text-[11px] text-gray-500 font-mono">
-            <span>Awaiting active scan sequence...</span>
+          <div class="flex items-center gap-4">
+            <div id="scan-timeline-feed" class="flex flex-col items-end gap-1 text-[11px] text-gray-500 font-mono">
+              <span>Awaiting active scan sequence...</span>
+            </div>
+            <button id="export-pdf-btn" class="px-4 py-2 rounded-xl bg-gradient-to-br from-sq-cyan to-sq-purple text-xs font-bold text-white tracking-wide hover:opacity-95 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-sq-cyan hidden">
+              Export PDF Report
+            </button>
           </div>
         </div>
       </section>
@@ -523,7 +531,48 @@
        CHART.JS INITIALIZATION
        ════════════════════════════════════════════════════════════════════ -->
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    
+      function triggerPdfExport() {
+        const expBtn1 = document.getElementById('export-pdf-btn');
+        const expBtn2 = document.getElementById('simple-export-pdf-btn');
+        
+        const originalText1 = expBtn1 ? expBtn1.innerText : '';
+        const originalText2 = expBtn2 ? expBtn2.innerText : '';
+        
+        if (expBtn1) expBtn1.innerText = 'Generating PDF...';
+        if (expBtn2) expBtn2.innerText = 'Generating PDF...';
+
+        fetch('http://localhost:3000/api/export-report', { method: 'POST' })
+          .then(res => {
+            if (!res.ok) throw new Error('Failed to generate PDF');
+            return res.blob();
+          })
+          .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'SurfaceQ_Security_Report.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+          })
+          .catch(err => {
+            console.error('PDF Export Error:', err);
+            alert('Failed to export PDF: ' + err.message);
+          })
+          .finally(() => {
+            if (expBtn1) expBtn1.innerText = originalText1;
+            if (expBtn2) expBtn2.innerText = originalText2;
+          });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const expBtn1 = document.getElementById('export-pdf-btn');
+        const expBtn2 = document.getElementById('simple-export-pdf-btn');
+        if (expBtn1) expBtn1.addEventListener('click', triggerPdfExport);
+        if (expBtn2) expBtn2.addEventListener('click', triggerPdfExport);
+
       // Set Mode classes
       const activeMode = localStorage.getItem('userMode') || 'simple';
       document.body.classList.remove('mode-simple', 'mode-expert');
@@ -1179,6 +1228,12 @@
             aiResponse.innerHTML = advice;
           }
         }
+
+        // Unhide Export PDF buttons when scan data is populated
+        const expBtn1 = document.getElementById('export-pdf-btn');
+        const expBtn2 = document.getElementById('simple-export-pdf-btn');
+        if (expBtn1) expBtn1.classList.remove('hidden');
+        if (expBtn2) expBtn2.classList.remove('hidden');
       }
 
       let latestScanInterval;

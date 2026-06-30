@@ -18,6 +18,7 @@ Surface-Q bridges the gap between manual inspection and active scanning by autom
 * **Dynamic vs Static Architecture Detection:** Intelligently determines if a site is a static SPA or a dynamic server-rendered app.
 * **Premium Dashboard:** A real-time, glassmorphic telemetry dashboard to view findings, complete with a live-feed and chat interface.
 * **Simple vs Expert Mode:** Toggle between high-level safety checks and deep-dive technical reports.
+* **Professional PDF Reporting:** Export your security assessment findings into a beautiful, commercial-grade PDF directly from the dashboard.
 
 ## 🏗 Architecture
 Surface-Q operates on a decoupled architecture, using a local Node.js server as the bridge between the browser extension and the UI dashboard.
@@ -48,7 +49,6 @@ Surface-Q operates entirely on your local machine. No browsing data is sent to c
 
 ## 🛣 Future Roadmap
 - Implementation of active vulnerability scanning modules.
-- Export findings to PDF / CSV.
 - Continuous monitoring via background polling.
 
 ## 📄 License

@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const dotenv = require('dotenv');
+const exportReportRouter = require('./routes/exportReport');
 
 // Load environment variables
 dotenv.config({ path: path.join(__dirname, '../.env') });
@@ -240,6 +241,9 @@ app.get('/api/scans/latest', (req, res) => {
   }
   res.json(latestScan);
 });
+
+// PDF Export Endpoint
+app.use('/api/export-report', exportReportRouter(() => latestScan));
 
 app.get('/api/scans/status', (req, res) => {
   res.json(currentScanStatus);

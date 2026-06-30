@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Surface-Q Security Report</title>
+  <style>
+    /* CSS will be injected here during generation or linked */
+    {{css}}
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1: COVER -->
+  <div class="page">
+    <div class="cover-page">
+      <div class="cover-logo">Surface-Q</div>
+      <h1 class="cover-title">Cybersecurity Assessment Report</h1>
+      <p class="cover-subtitle">Passive Attack Surface Discovery & AI Intelligence</p>
+      
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="meta-label">Target Website</div>
+          <div class="meta-value">{{domain}}</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Scan Date</div>
+          <div class="meta-value">{{scanDate}}</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Architecture</div>
+          <div class="meta-value">{{architecture}}</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Report ID</div>
+          <div class="meta-value" style="font-size: 12px;">{{reportId}}</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 60px;">
+        <div class="meta-label">Overall Risk Score</div>
+        <div class="risk-score-large {{riskClass}}">{{riskScore}}</div>
+      </div>
+    </div>
+    
+    <div class="page-footer">
+      <span>Surface-Q Automated Report</span>
+      <span class="page-number"></span>
+    </div>
+  </div>
+
+  <!-- PAGE 2: EXECUTIVE SUMMARY & OVERVIEW -->
+  <div class="page">
+    <h1>Executive Summary</h1>
+    <div class="ai-summary">
+      <h3>AI Assessment Posture</h3>
+      <p>{{executiveSummary}}</p>
+    </div>
+
+    <h2>Risk Overview</h2>
+    <div class="meta-grid" style="margin-bottom: 30px;">
+      <div class="meta-item">
+        <div class="meta-label">HTTPS Status</div>
+        <div class="meta-value">{{httpsStatus}}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Total Findings</div>
+        <div class="meta-value">{{totalFindings}}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Scan Duration</div>
+        <div class="meta-value">{{scanDuration}}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">AI Response Time</div>
+        <div class="meta-value">{{aiResponseTime}}</div>
+      </div>
+    </div>
+
+    <h2>Detected Technologies</h2>
+    <div class="tech-badges">
+      {{technologies}}
+    </div>
+    
+    <div class="page-footer">
+      <span>Surface-Q Automated Report</span>
+      <span class="page-number"></span>
+    </div>
+  </div>
+
+  <!-- PAGE 3: SECURITY HEADERS & FORMS -->
+  <div class="page">
+    <h1>Technical Footprint</h1>
+    
+    <h2>Security Headers</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Header</th>
+          <th>Status</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{securityHeaders}}
+      </tbody>
+    </table>
+
+    <h2>Detected Forms</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Method</th>
+          <th>Input Types</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{forms}}
+      </tbody>
+    </table>
+    
+    <div class="page-footer">
+      <span>Surface-Q Automated Report</span>
+      <span class="page-number"></span>
+    </div>
+  </div>
+
+  <!-- PAGE 4+: FINDINGS & RECOMMENDATIONS -->
+  <div class="page">
+    <h1>Security Findings</h1>
+    {{findings}}
+
+    <h1>AI Strategic Recommendations</h1>
+    <div class="ai-summary" style="border-color: var(--accent-purple);">
+      <h3 style="color: var(--accent-purple);">Remediation Roadmap</h3>
+      <p>{{aiRecommendations}}</p>
+    </div>
+
+    <h2 style="margin-top: 50px;">Privacy & Compliance Statement</h2>
+    <p style="font-size: 12px; color: var(--text-muted); padding: 15px; border: 1px solid var(--border-color); border-radius: 8px;">
+      <strong>Passive Analysis Only:</strong> This report was generated using purely observational, non-intrusive techniques. Surface-Q captures and analyzes network metadata, DOM structure, and HTTP headers broadcasted publicly by the target server. 
+      <br><br>
+      <strong>Data Segregation:</strong> Surface-Q DOES NOT collect, transmit, or analyze passwords, session tokens, cookie values, or any personally identifiable information (PII). No payloads were injected, and no active vulnerability exploits were attempted during this scan.
+    </p>
+    
+    <div class="page-footer">
+      <span>Surface-Q Automated Report</span>
+      <span class="page-number"></span>
+    </div>
+  </div>
+
+</body>
+</html>

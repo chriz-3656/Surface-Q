@@ -56,6 +56,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const runScan = (headers) => {
         // Send message to content script to collect DOM-based metrics
         chrome.tabs.sendMessage(activeTab.id, { action: "collect_metadata" }, (response) => {
+          if (chrome.runtime.lastError) {
+            console.log("Content script not reachable. Falling back to passive data.");
+          }
           const payload = response || {
             title: activeTab.title,
             url: activeTab.url,
