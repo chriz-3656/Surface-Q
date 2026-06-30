@@ -161,8 +161,8 @@ function buildReportHtml(scanData) {
   html = html.replace('{{executiveSummary}}', executiveSummary);
   html = html.replace('{{httpsStatus}}', httpsStatus);
   html = html.replace('{{totalFindings}}', totalFindings);
-  html = html.replace('{{scanDuration}}', scanData.scanDurationMs ? \`\${(scanData.scanDurationMs/1000).toFixed(2)}s\` : 'N/A');
-  html = html.replace('{{aiResponseTime}}', scanData.aiResponseTimeMs ? \`\${(scanData.aiResponseTimeMs/1000).toFixed(2)}s\` : 'N/A');
+  html = html.replace('{{scanDuration}}', scanData.scanDurationMs ? `${(scanData.scanDurationMs/1000).toFixed(2)}s` : 'N/A');
+  html = html.replace('{{aiResponseTime}}', scanData.aiResponseTimeMs ? `${(scanData.aiResponseTimeMs/1000).toFixed(2)}s` : 'N/A');
   html = html.replace('{{technologies}}', technologiesHtml);
   html = html.replace('{{securityHeaders}}', securityHeadersHtml);
   html = html.replace('{{forms}}', formsHtml);
