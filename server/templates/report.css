@@ -244,3 +244,52 @@ td {
   margin-top: 0;
   color: var(--accent-cyan);
 }
+
+/* Custom CSS Additions for Phase 2 Polish */
+.score-card {
+  display: flex;
+  gap: 40px;
+  margin-top: 50px;
+}
+.score-section {
+  display: flex;
+  flex-direction: column;
+}
+.score-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: -15px;
+}
+.finding-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+.finding-cell {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.finding-owasp {
+  margin-top: 15px;
+  font-size: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  border-left: 2px solid var(--accent-purple);
+}
+.badges {
+  display: flex;
+  gap: 10px;
+}
+.value-preview {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px 6px;
+  border-radius: 4px;
+}

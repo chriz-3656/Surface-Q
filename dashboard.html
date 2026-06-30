@@ -369,7 +369,7 @@
         <div class="glass-card flex flex-col h-full">
           <h3 class="section-title mb-4">Detected Tech Stack</h3>
           <div id="tech-stack-container" class="flex flex-wrap gap-2">
-            <span class="text-sm text-gray-500">Waiting for scan data...</span>
+            <div class="animate-pulse flex space-x-2 w-full"><div class="rounded bg-white/10 h-7 w-20"></div><div class="rounded bg-white/10 h-7 w-24"></div><div class="rounded bg-white/10 h-7 w-16"></div></div>
           </div>
         </div>
 
@@ -377,14 +377,14 @@
         <div class="glass-card flex flex-col h-full">
           <h3 class="section-title mb-4">Forms & Inputs</h3>
           <div id="forms-container" class="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-            <span class="text-sm text-gray-500">Waiting for scan data...</span>
+            <div class="animate-pulse flex flex-col space-y-2"><div class="rounded bg-white/10 h-12 w-full"></div><div class="rounded bg-white/10 h-12 w-full"></div></div>
           </div>
         </div>
 
         <!-- Raw Headers -->
         <div class="glass-card flex flex-col h-full">
           <h3 class="section-title mb-4">Raw HTTP Headers</h3>
-          <pre id="raw-headers-container" class="text-xs font-mono text-gray-400 bg-black/40 p-3 rounded border border-white/5 max-h-[200px] overflow-y-auto custom-scrollbar whitespace-pre-wrap word-break">Waiting for scan data...</pre>
+          <pre id="raw-headers-container" class="text-xs font-mono text-gray-400 bg-black/40 p-3 rounded border border-white/5 max-h-[200px] overflow-y-auto custom-scrollbar whitespace-pre-wrap word-break"><div class="animate-pulse space-y-2"><div class="rounded bg-white/5 h-4 w-3/4"></div><div class="rounded bg-white/5 h-4 w-1/2"></div><div class="rounded bg-white/5 h-4 w-5/6"></div></div></pre>
         </div>
 
       </section>
@@ -541,6 +541,9 @@
         
         if (expBtn1) expBtn1.innerText = 'Generating PDF...';
         if (expBtn2) expBtn2.innerText = 'Generating PDF...';
+        
+        const toastContainer = document.querySelector('sq-toast-container');
+        if (toastContainer) toastContainer.show('Generating Professional PDF Report...', 'info', 3000);
 
         fetch('http://localhost:3000/api/export-report', { method: 'POST' })
           .then(res => {
@@ -556,10 +559,15 @@
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
+            if (toastContainer) toastContainer.show('PDF Report Exported Successfully!', 'success', 5000);
           })
           .catch(err => {
             console.error('PDF Export Error:', err);
-            alert('Failed to export PDF: ' + err.message);
+            if (toastContainer) {
+              toastContainer.show('Failed to export PDF: ' + err.message, 'error', 6000);
+            } else {
+              alert('Failed to export PDF: ' + err.message);
+            }
           })
           .finally(() => {
             if (expBtn1) expBtn1.innerText = originalText1;
@@ -1267,7 +1275,11 @@
               if (data.status === 'Idle' || data.status.includes('Error')) {
                 dot.className = 'w-3 h-3 rounded-full bg-gray-500';
               } else if (data.status === 'Analysis Complete') {
-                dot.className = 'w-3 h-3 rounded-full bg-emerald-400';
+                if (!dot.classList.contains('bg-emerald-400')) {
+                  dot.className = 'w-3 h-3 rounded-full bg-emerald-400';
+                  const toastContainer = document.querySelector('sq-toast-container');
+                  if (toastContainer) toastContainer.show('Security Scan Completed Successfully', 'success', 4000);
+                }
                 clearInterval(liveStatusInterval);
                 clearInterval(latestScanInterval);
               } else {

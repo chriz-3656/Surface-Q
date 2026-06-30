@@ -17,6 +17,15 @@ chrome.webRequest.onHeadersReceived.addListener(
           timestamp: Date.now(),
           headers: headers
         };
+
+        // Memory Leak Fix: Keep cache size bounded (max 50 entries)
+        const keys = Object.keys(headerCache);
+        if (keys.length > 50) {
+          // Sort by timestamp and delete the oldest 10
+          keys.sort((a, b) => headerCache[a].timestamp - headerCache[b].timestamp)
+              .slice(0, 10)
+              .forEach(oldKey => delete headerCache[oldKey]);
+        }
       } catch (e) {
         console.error("Invalid URL in webRequest header listener", e);
       }
@@ -57,7 +66,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // Send message to content script to collect DOM-based metrics
         chrome.tabs.sendMessage(activeTab.id, { action: "collect_metadata" }, (response) => {
           if (chrome.runtime.lastError) {
-            console.log("Content script not reachable. Falling back to passive data.");
+            console.log("Content script not reachable. Falling back to passive data.", chrome.runtime.lastError.message);
           }
           const payload = response || {
             title: activeTab.title,
@@ -80,7 +89,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             body: JSON.stringify(payload)
           }).catch((err) => console.warn("Dashboard sync failed", err));
 
-          sendResponse({ status: "success", data: payload });
+          try {
+            sendResponse({ status: "success", data: payload });
+          } catch (e) {
+            // Suppress error if popup was already closed
+            console.log("Popup closed before response could be sent.");
+          }
         });
       };
 

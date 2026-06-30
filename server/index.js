@@ -201,6 +201,14 @@ async function generateAIAssessment(scan) {
 app.post('/api/scans', async (req, res) => {
   const scanData = req.body;
   
+  if (!scanData || typeof scanData !== 'object') {
+    return res.status(400).json({ error: 'Invalid payload: JSON object expected.' });
+  }
+  
+  if (!scanData.url || !scanData.domain) {
+    return res.status(400).json({ error: 'Invalid payload: url and domain are required fields.' });
+  }
+  
   // Track Live Timestamps and Status
   currentScanStatus = {
     status: 'AI Processing',

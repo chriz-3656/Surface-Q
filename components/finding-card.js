@@ -210,10 +210,10 @@ template.innerHTML = `
     <span class="badge" id="badge"></span>
     <span class="title" id="title"></span>
     <div class="actions">
-      <button class="icon-btn" id="copy-btn" title="Copy finding">
+      <button class="icon-btn" id="copy-btn" title="Copy finding" aria-label="Copy finding">
         <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
       </button>
-      <button class="icon-btn" id="toggle-btn" title="Toggle details">
+      <button class="icon-btn" id="toggle-btn" title="Toggle details" aria-expanded="false" aria-label="Toggle details">
         <svg class="toggle-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
     </div>
@@ -313,6 +313,7 @@ class SQFinding extends HTMLElement {
     this._expanded = !this._expanded;
     this._details.classList.toggle('open', this._expanded);
     this._toggleArrow.classList.toggle('open', this._expanded);
+    this._toggleBtn.setAttribute('aria-expanded', this._expanded.toString());
   }
 
   _copy() {
